@@ -71,6 +71,10 @@ public class Application {
         cbw.write("pid,1_class,2_class,3_class,4_class,5_class\n");
 
         BufferedReader trainBr = new BufferedReader(new FileReader(trainFile));
+        
+        
+        BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
+        orderBw.write("pid,price,num,uid,erUid\n");
 
         trainBr.lines().forEach(line -> {
             Matcher matcher = pattern.matcher(line);
@@ -132,6 +136,30 @@ public class Application {
                                 System.out.println(rec);
                                 e.printStackTrace();
                             }
+                        }
+                    });
+                }
+                if ("order".equals(rec.getAct())){
+                    Map<String, Object> orderData = rec.getData();
+                    List<ProductRecord> plist = (List<ProductRecord>) orderData.get("plist");
+                    // Record{ua=null, ip='220.129.169.163', ts=Sun Feb 01 00:45:43 CST 2015, 
+                    // data={uid=U180944017, plist=[{pid="0014560652", price=849, num=1}], act=order, 
+                    // erUid=6c685cbe-cc40-609a-3da2-d48e4ed7b771}, code=302, bytes=160, referer='-'}
+
+                    Object uid = orderData.get("uid");
+                    Object erUid = orderData.get("erUid");
+                    StringBuilder sb = new StringBuilder();
+                    plist.forEach(productRecord -> {
+                        sb.setLength(0);
+                        // pid,price,num,uid,erUid
+                        sb.append(productRecord.getPid()).append(",");
+                        sb.append(productRecord.getPrice()).append(",");
+                        sb.append(productRecord.getNum()).append(",");
+                        sb.append(uid).append(",");
+                        sb.append(erUid).append("\n");
+                        try {
+                            orderBw.write(sb.toString());
+                        } catch (Exception e) {
                         }
                     });
                 }
@@ -200,6 +228,8 @@ public class Application {
 
         trainBr.close();
         testBr.close();
+        
+        orderBw.close();
 
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
