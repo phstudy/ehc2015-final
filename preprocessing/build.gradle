@@ -3,11 +3,25 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.6
+
+compileJava {
+    targetCompatibility = 1.6
+}
+
+mainClassName = "Application"
+
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
 }
 
 dependencies {

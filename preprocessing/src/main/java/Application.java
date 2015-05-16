@@ -6,9 +6,6 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public class Application {
 
-    static String baseDir = "/Users/study/Desktop/EHC";
+    static String baseDir = "/root/dataset";
 
     static {
 
@@ -33,6 +30,8 @@ public class Application {
     }
 
     public static void main(String[] args) throws Exception {
+        final long startTime = System.currentTimeMillis();
+        System.out.println("start: " + new Date());
 
         String regex = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"GET /action\\?;(.+?) HTTP/1.(\\d+)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"";
 
@@ -42,8 +41,8 @@ public class Application {
         // category
         BufferedWriter categoryBw = new BufferedWriter(new FileWriter(file("train_category.csv")));
         BufferedWriter categoryTestBw = new BufferedWriter(new FileWriter(file("test_category.csv")));
-        Set<String> categoryPids = new HashSet<>(200000);
-        Set<String> categoryTestPids = new HashSet<>(200000);
+        Set<String> categoryPids = new HashSet<String>(200000);
+        Set<String> categoryTestPids = new HashSet<String>(200000);
         categoryBw.write("pid,class1,class2,class3,class4,class5\n");
         categoryTestBw.write("pid,class1,class2,class3,class4,class5\n");
 
@@ -55,7 +54,7 @@ public class Application {
 
         // price
         BufferedWriter priceBw = new BufferedWriter(new FileWriter(file("price.csv")));
-        Set<String> pricePids = new HashSet<>(200000);
+        Set<String> pricePids = new HashSet<String>(200000);
 
         // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
@@ -66,13 +65,14 @@ public class Application {
         BufferedWriter viewTestBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
         viewBw.write("pid,ts,ip,uid,eruid\n");
         viewTestBw.write("pid,ts,ip,uid,eruid\n");
-        
+
 
         // datasets
         BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
         BufferedReader testBr = new BufferedReader(new FileReader(file("EHC_2nd_round_test_clean.log")));
 
-        trainBr.lines().forEach(line -> {
+        String line;
+        while ((line = trainBr.readLine()) != null) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
                 String ip = matcher.group(1);
@@ -120,7 +120,7 @@ public class Application {
                 } else if ("cart".equals(rec.getAct()) || "order".equals(rec.getAct())) {
                     List<ProductRecord> plist = (List<ProductRecord>) rec.getData().get("plist");
 
-                    plist.forEach(productRecord -> {
+                    for (ProductRecord productRecord : plist) {
                         if (!pricePids.contains(productRecord.getPid())) {
                             pricePids.add(productRecord.getPid());
 
@@ -131,7 +131,8 @@ public class Application {
                                 e.printStackTrace();
                             }
                         }
-                    });
+                    }
+                    ;
                 } else if ("search".equals(rec.getAct())) {
                     try {
                         StringBuilder sb = new StringBuilder(20);
@@ -146,16 +147,16 @@ public class Application {
                         e.printStackTrace();
                     }
                 }
-                if ("view".equals(rec.getAct())){
+                if ("view".equals(rec.getAct())) {
                     extractViewRecord(viewBw, rec);
                 }
-                if ("order".equals(rec.getAct())){
+                if ("order".equals(rec.getAct())) {
                     extractOrderRecord(orderBw, rec);
                 }
             }
-        });
+        }
 
-        testBr.lines().forEach(line -> {
+        while ((line = testBr.readLine()) != null) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
                 String ip = matcher.group(1);
@@ -208,16 +209,17 @@ public class Application {
                         sb.append(rec.getData().get("keywords") + ",");
                         sb.append(rec.getData().get("erUid"));
 
-                        searchTestBw.write(sb.toString() + "\n");                    } catch (Exception e) {
+                        searchTestBw.write(sb.toString() + "\n");
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                
-                if ("view".equals(rec.getAct())){
+
+                if ("view".equals(rec.getAct())) {
                     extractViewRecord(viewTestBw, rec);
                 }
             }
-        });
+        }
 
         // category
         categoryBw.flush();
@@ -249,7 +251,9 @@ public class Application {
         trainBr.close();
         testBr.close();
 
-        //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
+        final long endTime = System.currentTimeMillis();
+        System.out.println("done: " + new Date());
+        System.out.println("Total execution time: " + (endTime - startTime));
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Category.containCategory, Category.toCategory, Category.toCount));
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_test_clean.log", Category.containCategory, Category.toCategory, Category.toCount));
@@ -270,9 +274,10 @@ public class Application {
 
         Object uid = orderData.get("uid");
         Object erUid = orderData.get("erUid");
-        
+
         StringBuilder sb = new StringBuilder();
-        plist.forEach(productRecord -> {
+
+        for (ProductRecord productRecord : plist) {
             sb.setLength(0);
             // pid,ts,ip,price,num,uid,eruid
             sb.append(productRecord.getPid()).append(",");
@@ -286,7 +291,7 @@ public class Application {
                 orderBw.write(sb.toString());
             } catch (Exception e) {
             }
-        });
+        }
     }
 
     protected static void extractViewRecord(BufferedWriter viewBw, Record rec) {
@@ -294,21 +299,21 @@ public class Application {
         // data={uid=, act=view, cat=[H, H_002, H_002_013, H_002_013_007, H_002_013_007_006], 
         // erUid=4547674a-2322-9350-c6d2-7fbbe1133e5e, pid=0012586604}, 
         // code=302, bytes=160, referer='-'}
-        
-        
+
+
         // pid,ts,ip,uid,eruid
         Map<String, Object> orderData = rec.getData();
         Object pid = orderData.get("pid");
         Object uid = orderData.get("uid");
         Object erUid = orderData.get("erUid");
-        
+
         StringBuilder viewSb = new StringBuilder();
         viewSb.append(pid).append(",");
         viewSb.append(rec.getTs().getTime()).append(",");
         viewSb.append(rec.getIp()).append(",");
         viewSb.append(uid).append(",");
         viewSb.append(erUid).append("\n");
-        
+
         try {
             viewBw.write(viewSb.toString());
         } catch (Exception e) {
@@ -317,7 +322,7 @@ public class Application {
     }
 
     public static Map<String, Object> requestToMap(String str) {
-        Map<String, Object> rst = new HashMap<>(10);
+        Map<String, Object> rst = new HashMap<String, Object>(10);
         int lastChar = str.charAt(str.length() - 1);
         if (lastChar == ';') {
             str = str.substring(0, str.length() - 1);
@@ -362,7 +367,7 @@ public class Application {
         String[] parts = categories.split(",");
         List<String> rst;
         if (parts.length > 0 && parts[0].length() != 1) {
-            rst = new ArrayList<>(5);
+            rst = new ArrayList<String>(5);
             String[] cparts = parts[0].split("_");
             String str = cparts[0];
             rst.add(str);
@@ -378,7 +383,7 @@ public class Application {
     }
 
     public static List<ProductRecord> plistToList(String plist) {
-        List<ProductRecord> rst = new ArrayList<>();
+        List<ProductRecord> rst = new ArrayList<ProductRecord>();
 
         String[] records = plist.split(",");
 
@@ -400,10 +405,10 @@ public class Application {
         return rst;
     }
 
-    public static IntSummaryStatistics getSummaryStatistics(String filename, Predicate<String> filter,
-                                                            Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
-        File file = new File(filename);
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        return br.lines().filter(filter).map(map).mapToInt(toInt).filter(val -> val > 0).summaryStatistics();
-    }
+//    public static IntSummaryStatistics getSummaryStatistics(String filename, Predicate<String> filter,
+//                                                            Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
+//        File file = new File(filename);
+//        BufferedReader br = new BufferedReader(new FileReader(file));
+//        return br.lines().filter(filter).map(map).mapToInt(toInt).filter(val -> val > 0).summaryStatistics();
+//    }
 }
