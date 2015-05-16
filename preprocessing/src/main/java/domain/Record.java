@@ -1,9 +1,9 @@
 package domain;
 
-import eu.bitwalker.useragentutils.UserAgent;
-
 import java.util.Date;
 import java.util.Map;
+
+import net.sf.uadetector.UserAgent;
 
 /**
  * Created by study on 5/16/15.
