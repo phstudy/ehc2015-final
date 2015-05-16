@@ -75,6 +75,9 @@ public class Application {
         orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
         BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("view.csv")));
         viewBw.write("pid,ts,ip,uid,eruid\n");
+        BufferedWriter testViewBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
+        testViewBw.write("pid,ts,ip,uid,eruid\n");
+        
 
         // datasets
         BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
@@ -156,57 +159,10 @@ public class Application {
                     }
                 }
                 if ("view".equals(rec.getAct())){
-                    // Record{ua=null, ip='218.164.82.134', ts=Sun Feb 01 00:56:16 CST 2015, 
-                    // data={uid=, act=view, cat=[H, H_002, H_002_013, H_002_013_007, H_002_013_007_006], 
-                    // erUid=4547674a-2322-9350-c6d2-7fbbe1133e5e, pid=0012586604}, 
-                    // code=302, bytes=160, referer='-'}
-                    
-                    
-                    // pid,ts,ip,uid,eruid
-                    Map<String, Object> orderData = rec.getData();
-                    Object pid = orderData.get("pid");
-                    Object uid = orderData.get("uid");
-                    Object erUid = orderData.get("erUid");
-                    
-                    StringBuilder viewSb = new StringBuilder();
-                    viewSb.append(pid).append(",");
-                    viewSb.append(rec.getTs().getTime()).append(",");
-                    viewSb.append(rec.getIp()).append(",");
-                    viewSb.append(uid).append(",");
-                    viewSb.append(erUid).append("\n");
-                    
-                    try {
-                        viewBw.write(viewSb.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    extractViewRecord(viewBw, rec);
                 }
                 if ("order".equals(rec.getAct())){
-                    Map<String, Object> orderData = rec.getData();
-                    List<ProductRecord> plist = (List<ProductRecord>) orderData.get("plist");
-                    // Record{ua=null, ip='220.129.169.163', ts=Sun Feb 01 00:45:43 CST 2015, 
-                    // data={uid=U180944017, plist=[{pid="0014560652", price=849, num=1}], act=order, 
-                    // erUid=6c685cbe-cc40-609a-3da2-d48e4ed7b771}, code=302, bytes=160, referer='-'}
-
-                    Object uid = orderData.get("uid");
-                    Object erUid = orderData.get("erUid");
-                    
-                    StringBuilder sb = new StringBuilder();
-                    plist.forEach(productRecord -> {
-                        sb.setLength(0);
-                        // pid,ts,ip,price,num,uid,eruid
-                        sb.append(productRecord.getPid()).append(",");
-                        sb.append(rec.getTs().getTime()).append(",");
-                        sb.append(rec.getIp()).append(",");
-                        sb.append(productRecord.getPrice()).append(",");
-                        sb.append(productRecord.getNum()).append(",");
-                        sb.append(uid).append(",");
-                        sb.append(erUid).append("\n");
-                        try {
-                            orderBw.write(sb.toString());
-                        } catch (Exception e) {
-                        }
-                    });
+                    extractOrderRecord(orderBw, rec);
                 }
             }
         });
@@ -270,6 +226,10 @@ public class Application {
                         e.printStackTrace();
                     }
                 }
+                
+                if ("view".equals(rec.getAct())){
+                    extractViewRecord(testViewBw, rec);
+                }
             }
         });
 
@@ -290,6 +250,7 @@ public class Application {
         
         orderBw.close();
         viewBw.close();
+        testViewBw.close();
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Category.containCategory, Category.toCategory, Category.toCount));
@@ -300,6 +261,61 @@ public class Application {
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Plist.containPlist, Plist.toPlist, Plist.toCount));
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_test_clean.log", Plist.containPlist, Plist.toPlist, Plist.toCount));
+    }
+
+    protected static void extractOrderRecord(BufferedWriter orderBw, Record rec) {
+        Map<String, Object> orderData = rec.getData();
+        List<ProductRecord> plist = (List<ProductRecord>) orderData.get("plist");
+        // Record{ua=null, ip='220.129.169.163', ts=Sun Feb 01 00:45:43 CST 2015, 
+        // data={uid=U180944017, plist=[{pid="0014560652", price=849, num=1}], act=order, 
+        // erUid=6c685cbe-cc40-609a-3da2-d48e4ed7b771}, code=302, bytes=160, referer='-'}
+
+        Object uid = orderData.get("uid");
+        Object erUid = orderData.get("erUid");
+        
+        StringBuilder sb = new StringBuilder();
+        plist.forEach(productRecord -> {
+            sb.setLength(0);
+            // pid,ts,ip,price,num,uid,eruid
+            sb.append(productRecord.getPid()).append(",");
+            sb.append(rec.getTs().getTime()).append(",");
+            sb.append(rec.getIp()).append(",");
+            sb.append(productRecord.getPrice()).append(",");
+            sb.append(productRecord.getNum()).append(",");
+            sb.append(uid).append(",");
+            sb.append(erUid).append("\n");
+            try {
+                orderBw.write(sb.toString());
+            } catch (Exception e) {
+            }
+        });
+    }
+
+    protected static void extractViewRecord(BufferedWriter viewBw, Record rec) {
+        // Record{ua=null, ip='218.164.82.134', ts=Sun Feb 01 00:56:16 CST 2015, 
+        // data={uid=, act=view, cat=[H, H_002, H_002_013, H_002_013_007, H_002_013_007_006], 
+        // erUid=4547674a-2322-9350-c6d2-7fbbe1133e5e, pid=0012586604}, 
+        // code=302, bytes=160, referer='-'}
+        
+        
+        // pid,ts,ip,uid,eruid
+        Map<String, Object> orderData = rec.getData();
+        Object pid = orderData.get("pid");
+        Object uid = orderData.get("uid");
+        Object erUid = orderData.get("erUid");
+        
+        StringBuilder viewSb = new StringBuilder();
+        viewSb.append(pid).append(",");
+        viewSb.append(rec.getTs().getTime()).append(",");
+        viewSb.append(rec.getIp()).append(",");
+        viewSb.append(uid).append(",");
+        viewSb.append(erUid).append("\n");
+        
+        try {
+            viewBw.write(viewSb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Map<String, Object> requestToMap(String str) {
