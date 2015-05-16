@@ -26,10 +26,11 @@ import domain.Record;
  */
 public class Application {
 
-    static String baseDir = "/root/dataset";
+    static String baseDir = "/Users/study/Desktop/EHC";
+    static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
+    static SimpleDateFormat targetSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
     static {
-
         String preferedBaseDir = System.getProperty("EHC_FINAL_DATASET_DIR");
         if (preferedBaseDir != null && new File(preferedBaseDir).exists() && new File(preferedBaseDir).isDirectory()) {
             baseDir = new File(preferedBaseDir).getAbsolutePath();
@@ -42,13 +43,13 @@ public class Application {
     }
 
     public static void main(String[] args) throws Exception {
+
         final long startTime = System.currentTimeMillis();
         System.out.println("start: " + new Date());
 
         String regex = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"GET /action\\?;(.+?) HTTP/1.(\\d+)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"";
 
         Pattern pattern = Pattern.compile(regex);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
 
         // category
         BufferedWriter categoryBw = new BufferedWriter(new FileWriter(file("train_category.csv")));
@@ -149,7 +150,7 @@ public class Application {
                     try {
                         StringBuilder sb = new StringBuilder(20);
                         sb.append(rec.getIp() + ",");
-                        sb.append(rec.getTs().getTime() + ",");
+                        sb.append(targetSdf.format(rec.getTs()) + ",");
                         sb.append(rec.getData().get("uid") + ",");
                         sb.append(rec.getData().get("keywords") + ",");
                         sb.append(rec.getData().get("erUid"));
@@ -216,7 +217,7 @@ public class Application {
                     try {
                         StringBuilder sb = new StringBuilder(20);
                         sb.append(rec.getIp() + ",");
-                        sb.append(rec.getTs().getTime() + ",");
+                        sb.append(targetSdf.format(rec.getTs()) + ",");
                         sb.append(rec.getData().get("uid") + ",");
                         sb.append(rec.getData().get("keywords") + ",");
                         sb.append(rec.getData().get("erUid"));
@@ -293,7 +294,7 @@ public class Application {
             sb.setLength(0);
             // pid,ts,ip,price,num,uid,eruid
             sb.append(productRecord.getPid()).append(",");
-            sb.append(rec.getTs().getTime()).append(",");
+            sb.append(targetSdf.format(rec.getTs())).append(",");
             sb.append(rec.getIp()).append(",");
             sb.append(productRecord.getPrice()).append(",");
             sb.append(productRecord.getNum()).append(",");
@@ -321,7 +322,7 @@ public class Application {
 
         StringBuilder viewSb = new StringBuilder();
         viewSb.append(pid).append(",");
-        viewSb.append(rec.getTs().getTime()).append(",");
+        viewSb.append(targetSdf.format(rec.getTs())).append(",");
         viewSb.append(rec.getIp()).append(",");
         viewSb.append(uid).append(",");
         viewSb.append(erUid).append("\n");
