@@ -1,16 +1,29 @@
-import domain.ProductRecord;
-import domain.Record;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import domain.ProductRecord;
+import domain.Record;
 
 /**
  * Created by study on 5/14/15.
@@ -60,6 +73,8 @@ public class Application {
         // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
         orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
+        BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("view.csv")));
+        viewBw.write("pid,ts,ip,uid,eruid\n");
 
         // datasets
         BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
@@ -136,6 +151,32 @@ public class Application {
                         sb.append(rec.getData().get("erUid"));
 
                         searchBw.write(sb.toString() + "\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if ("view".equals(rec.getAct())){
+                    // Record{ua=null, ip='218.164.82.134', ts=Sun Feb 01 00:56:16 CST 2015, 
+                    // data={uid=, act=view, cat=[H, H_002, H_002_013, H_002_013_007, H_002_013_007_006], 
+                    // erUid=4547674a-2322-9350-c6d2-7fbbe1133e5e, pid=0012586604}, 
+                    // code=302, bytes=160, referer='-'}
+                    
+                    
+                    // pid,ts,ip,uid,eruid
+                    Map<String, Object> orderData = rec.getData();
+                    Object pid = orderData.get("pid");
+                    Object uid = orderData.get("uid");
+                    Object erUid = orderData.get("erUid");
+                    
+                    StringBuilder viewSb = new StringBuilder();
+                    viewSb.append(pid).append(",");
+                    viewSb.append(rec.getTs().getTime()).append(",");
+                    viewSb.append(rec.getIp()).append(",");
+                    viewSb.append(uid).append(",");
+                    viewSb.append(erUid).append("\n");
+                    
+                    try {
+                        viewBw.write(viewSb.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -248,7 +289,7 @@ public class Application {
         testBr.close();
         
         orderBw.close();
-
+        viewBw.close();
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Category.containCategory, Category.toCategory, Category.toCount));
