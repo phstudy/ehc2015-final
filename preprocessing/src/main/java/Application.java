@@ -56,30 +56,29 @@ public class Application {
         BufferedWriter categoryTestBw = new BufferedWriter(new FileWriter(file("test_category.csv")));
         Set<String> categoryPids = new HashSet<String>(200000);
         Set<String> categoryTestPids = new HashSet<String>(200000);
-        categoryBw.write("pid,class1,class2,class3,class4,class5\n");
-        categoryTestBw.write("pid,class1,class2,class3,class4,class5\n");
+        //categoryBw.write("pid,class1,class2,class3,class4,class5\n");
+        //categoryTestBw.write("pid,class1,class2,class3,class4,class5\n");
 
         // search
         BufferedWriter searchBw = new BufferedWriter(new FileWriter(file("train_search.csv")));
         BufferedWriter searchTestBw = new BufferedWriter(new FileWriter(file("test_search.csv")));
-        searchBw.write("ip,ts,uid,keywords,eruid\n");
-        searchTestBw.write("ip,ts,uid,keywords,eruid\n");
+        //searchBw.write("ip,ts,uid,keywords,eruid\n");
+        //searchTestBw.write("ip,ts,uid,keywords,eruid\n");
 
         // price
         BufferedWriter priceBw = new BufferedWriter(new FileWriter(file("price.csv")));
         Set<String> pricePids = new HashSet<String>(200000);
-        priceBw.write("pid,price\n");
+        //priceBw.write("pid,price\n");
 
         // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
-        orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
+        //orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
 
         // view
         BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("train_view.csv")));
         BufferedWriter viewTestBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
-        viewBw.write("pid,ts,ip,uid,eruid\n");
-        viewTestBw.write("pid,ts,ip,uid,eruid\n");
-
+        //viewBw.write("pid,ts,ip,uid,eruid\n");
+        //viewTestBw.write("pid,ts,ip,uid,eruid\n");
 
         // datasets
         BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
