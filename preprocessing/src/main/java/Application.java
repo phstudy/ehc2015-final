@@ -1,29 +1,16 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import domain.ProductRecord;
+import domain.Record;
+
+import java.io.*;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import domain.ProductRecord;
-import domain.Record;
 
 /**
  * Created by study on 5/14/15.
@@ -57,18 +44,29 @@ public class Application {
         File categoryFile = file("train_category.csv");
         File testCategoryFile = file("test_category.csv");
 
+        File trainSearchFile = file("train_search.csv");
+        File testSearchFile = file("test_search.csv");
+
         File priceFile = file("price.csv");
 
+        // category
         BufferedWriter cbw = new BufferedWriter(new FileWriter(categoryFile));
-        Set<String> cbw_pids = new HashSet<>(200000);
-
         BufferedWriter tcbw = new BufferedWriter(new FileWriter(testCategoryFile));
+        Set<String> cbw_pids = new HashSet<>(200000);
         Set<String> tcbw_pids = new HashSet<>(200000);
+        cbw.write("pid,class1,class2,class3,class4,class5\n");
+        tcbw.write("pid,class1,class2,class3,class4,class5\n");
+
+
+        // search
+        BufferedWriter sbw = new BufferedWriter(new FileWriter(trainSearchFile));
+        BufferedWriter tsbw = new BufferedWriter(new FileWriter(testSearchFile));
+        sbw.write("ip,ts,uid,keywords,er_uid\n");
+        tsbw.write("ip,ts,uid,keywords,er_uid\n");
+
 
         BufferedWriter pbw = new BufferedWriter(new FileWriter(priceFile));
         Set<String> pbw_pids = new HashSet<>(200000);
-
-        cbw.write("pid,1_class,2_class,3_class,4_class,5_class\n");
 
         BufferedReader trainBr = new BufferedReader(new FileReader(trainFile));
         
@@ -122,8 +120,7 @@ public class Application {
                             e.printStackTrace();
                         }
                     }
-                }
-                if ("cart".equals(rec.getAct()) || "order".equals(rec.getAct())) {
+                } else if ("cart".equals(rec.getAct()) || "order".equals(rec.getAct())) {
                     List<ProductRecord> plist = (List<ProductRecord>) rec.getData().get("plist");
 
                     plist.forEach(productRecord -> {
@@ -138,6 +135,19 @@ public class Application {
                             }
                         }
                     });
+                } else if ("search".equals(rec.getAct())) {
+                    try {
+                        StringBuilder sb = new StringBuilder(20);
+                        sb.append(rec.getIp() + ",");
+                        sb.append(rec.getTs().getTime() + ",");
+                        sb.append(rec.getData().get("uid") + ",");
+                        sb.append(rec.getData().get("keywords") + ",");
+                        sb.append(rec.getData().get("erUid"));
+
+                        sbw.write(sb.toString() + "\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 if ("order".equals(rec.getAct())){
                     Map<String, Object> orderData = rec.getData();
@@ -213,15 +223,30 @@ public class Application {
                             e.printStackTrace();
                         }
                     }
+                } else if ("search".equals(rec.getAct())) {
+                    try {
+                        StringBuilder sb = new StringBuilder(20);
+                        sb.append(rec.getIp() + ",");
+                        sb.append(rec.getTs().getTime() + ",");
+                        sb.append(rec.getData().get("uid") + ",");
+                        sb.append(rec.getData().get("keywords") + ",");
+                        sb.append(rec.getData().get("erUid"));
+
+                        tsbw.write(sb.toString() + "\n");                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
-        
+
         cbw.flush();
         cbw.close();
 
         tcbw.flush();
         tcbw.close();
+
+        tsbw.flush();
+        tsbw.close();
 
         pbw.flush();
         pbw.close();
@@ -264,6 +289,8 @@ public class Application {
                 try {
                     value = URLDecoder.decode(value, "UTF-8");
                     value = URLDecoder.decode(value, "UTF-8");
+                    value = URLDecoder.decode(value, "UTF-8");
+                    value.replace(',', '|');
                     object = value;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -326,7 +353,7 @@ public class Application {
     }
 
     public static IntSummaryStatistics getSummaryStatistics(String filename, Predicate<String> filter,
-            Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
+                                                            Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
         File file = new File(filename);
         BufferedReader br = new BufferedReader(new FileReader(file));
         return br.lines().filter(filter).map(map).mapToInt(toInt).filter(val -> val > 0).summaryStatistics();
