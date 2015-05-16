@@ -39,40 +39,31 @@ public class Application {
         Pattern pattern = Pattern.compile(regex);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
 
-        File trainFile = file("EHC_2nd_round_train.log");
-        File testFile = file("EHC_2nd_round_test_clean.log");
-        File categoryFile = file("train_category.csv");
-        File testCategoryFile = file("test_category.csv");
-
-        File trainSearchFile = file("train_search.csv");
-        File testSearchFile = file("test_search.csv");
-
-        File priceFile = file("price.csv");
-
         // category
-        BufferedWriter cbw = new BufferedWriter(new FileWriter(categoryFile));
-        BufferedWriter tcbw = new BufferedWriter(new FileWriter(testCategoryFile));
-        Set<String> cbw_pids = new HashSet<>(200000);
-        Set<String> tcbw_pids = new HashSet<>(200000);
-        cbw.write("pid,class1,class2,class3,class4,class5\n");
-        tcbw.write("pid,class1,class2,class3,class4,class5\n");
-
+        BufferedWriter categoryBw = new BufferedWriter(new FileWriter(file("train_category.csv")));
+        BufferedWriter categoryTestBw = new BufferedWriter(new FileWriter(file("test_category.csv")));
+        Set<String> categoryPids = new HashSet<>(200000);
+        Set<String> categoryTestPids = new HashSet<>(200000);
+        categoryBw.write("pid,class1,class2,class3,class4,class5\n");
+        categoryTestBw.write("pid,class1,class2,class3,class4,class5\n");
 
         // search
-        BufferedWriter sbw = new BufferedWriter(new FileWriter(trainSearchFile));
-        BufferedWriter tsbw = new BufferedWriter(new FileWriter(testSearchFile));
-        sbw.write("ip,ts,uid,keywords,er_uid\n");
-        tsbw.write("ip,ts,uid,keywords,er_uid\n");
+        BufferedWriter searchBw = new BufferedWriter(new FileWriter(file("train_search.csv")));
+        BufferedWriter searchTestBw = new BufferedWriter(new FileWriter(file("test_search.csv")));
+        searchBw.write("ip,ts,uid,keywords,eruid\n");
+        searchTestBw.write("ip,ts,uid,keywords,eruid\n");
 
+        // price
+        BufferedWriter pricebw = new BufferedWriter(new FileWriter(file("price.csv")));
+        Set<String> pricePids = new HashSet<>(200000);
 
-        BufferedWriter pbw = new BufferedWriter(new FileWriter(priceFile));
-        Set<String> pbw_pids = new HashSet<>(200000);
-
-        BufferedReader trainBr = new BufferedReader(new FileReader(trainFile));
-        
-        
+        // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
         orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
+
+        // datasets
+        BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
+        BufferedReader testBr = new BufferedReader(new FileReader(file("EHC_2nd_round_test_clean.log")));
 
         trainBr.lines().forEach(line -> {
             Matcher matcher = pattern.matcher(line);
@@ -97,8 +88,8 @@ public class Application {
                 // generate category dataset
                 if ("view".equals(rec.getAct())) {
                     String pid = (String) rec.getData().get("pid");
-                    if (!cbw_pids.contains(pid)) {
-                        cbw_pids.add(pid);
+                    if (!categoryPids.contains(pid)) {
+                        categoryPids.add(pid);
 
                         List<String> categories = (List<String>) rec.getData().get("cat");
                         try {
@@ -114,7 +105,7 @@ public class Application {
                                     sb.append(",");
                                 }
                             }
-                            cbw.write(sb.toString());
+                            categoryBw.write(sb.toString());
                         } catch (Exception e) {
                             System.out.println(rec);
                             e.printStackTrace();
@@ -124,11 +115,11 @@ public class Application {
                     List<ProductRecord> plist = (List<ProductRecord>) rec.getData().get("plist");
 
                     plist.forEach(productRecord -> {
-                        if (!pbw_pids.contains(productRecord.getPid())) {
-                            pbw_pids.add(productRecord.getPid());
+                        if (!pricePids.contains(productRecord.getPid())) {
+                            pricePids.add(productRecord.getPid());
 
                             try {
-                                pbw.write(productRecord.getPid() + "," + productRecord.getPrice() + "\n");
+                                pricebw.write(productRecord.getPid() + "," + productRecord.getPrice() + "\n");
                             } catch (Exception e) {
                                 System.out.println(rec);
                                 e.printStackTrace();
@@ -144,7 +135,7 @@ public class Application {
                         sb.append(rec.getData().get("keywords") + ",");
                         sb.append(rec.getData().get("erUid"));
 
-                        sbw.write(sb.toString() + "\n");
+                        searchBw.write(sb.toString() + "\n");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -179,7 +170,6 @@ public class Application {
             }
         });
 
-        BufferedReader testBr = new BufferedReader(new FileReader(testFile));
         testBr.lines().forEach(line -> {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
@@ -203,8 +193,8 @@ public class Application {
                 // generate category dataset
                 if ("view".equals(rec.getAct())) {
                     String pid = (String) rec.getData().get("pid");
-                    if (!tcbw_pids.contains(pid)) {
-                        tcbw_pids.add(pid);
+                    if (!categoryTestPids.contains(pid)) {
+                        categoryTestPids.add(pid);
 
                         List<String> categories = (List<String>) rec.getData().get("cat");
                         try {
@@ -220,7 +210,7 @@ public class Application {
                                     sb.append(",");
                                 }
                             }
-                            tcbw.write(sb.toString());
+                            categoryTestBw.write(sb.toString());
                         } catch (Exception e) {
                             System.out.println(rec);
                             e.printStackTrace();
@@ -235,24 +225,24 @@ public class Application {
                         sb.append(rec.getData().get("keywords") + ",");
                         sb.append(rec.getData().get("erUid"));
 
-                        tsbw.write(sb.toString() + "\n");                    } catch (Exception e) {
+                        searchTestBw.write(sb.toString() + "\n");                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
 
-        cbw.flush();
-        cbw.close();
+        categoryBw.flush();
+        categoryBw.close();
 
-        tcbw.flush();
-        tcbw.close();
+        categoryTestBw.flush();
+        categoryTestBw.close();
 
-        tsbw.flush();
-        tsbw.close();
+        searchTestBw.flush();
+        searchTestBw.close();
 
-        pbw.flush();
-        pbw.close();
+        pricebw.flush();
+        pricebw.close();
 
         trainBr.close();
         testBr.close();
