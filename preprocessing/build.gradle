@@ -1,0 +1,18 @@
+group 'org.phstudy'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'net.sf.opencsv:opencsv:2.3'
+    compile 'net.sf.uadetector:uadetector-resources:2014.10'
+    compile 'net.sf.uadetector:uadetector-core:0.9.22'
+    compile 'com.google.guava:guava:18.0'
+}
