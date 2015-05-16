@@ -1,21 +1,49 @@
-import domain.ProductRecord;
-import domain.Record;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import domain.ProductRecord;
+import domain.Record;
+
 /**
  * Created by study on 5/14/15.
  */
 public class Application {
+
+    static String baseDir = "/Users/study/Desktop/EHC";
+
+    static {
+
+        String preferedBaseDir = System.getProperty("EHC_FINAL_DATASET_DIR");
+        if (preferedBaseDir != null && new File(preferedBaseDir).exists() && new File(preferedBaseDir).isDirectory()) {
+            baseDir = new File(preferedBaseDir).getAbsolutePath();
+            System.err.println("reset base-dir as " + baseDir);
+        }
+    }
+
+    static File file(String name) {
+        return new File(baseDir, name);
+    }
+
     public static void main(String[] args) throws Exception {
 
         String regex = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"GET /action\\?;(.+?) HTTP/1.(\\d+)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"";
@@ -23,10 +51,10 @@ public class Application {
         Pattern pattern = Pattern.compile(regex);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
 
-        File trainFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_train.log");
-        File testFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_test_clean.log");
-        File categoryFile = new File("/Users/study/Desktop/EHC/category.csv");
-        File priceFile = new File("/Users/study/Desktop/EHC/price.csv");
+        File trainFile = file("EHC_2nd_round_train.log");
+        File testFile = file("EHC_2nd_round_test_clean.log");
+        File categoryFile = file("category.csv");
+        File priceFile = file("price.csv");
 
         BufferedWriter cbw = new BufferedWriter(new FileWriter(categoryFile));
         Set<String> cbw_pids = new HashSet<>(200000);
@@ -88,7 +116,7 @@ public class Application {
                     List<ProductRecord> plist = (List<ProductRecord>) rec.getData().get("plist");
 
                     plist.forEach(productRecord -> {
-                        if (!pbw_pids.contains(productRecord.getPid()) || true) {
+                        if (!pbw_pids.contains(productRecord.getPid())) {
                             pbw_pids.add(productRecord.getPid());
 
                             try {
@@ -103,7 +131,6 @@ public class Application {
         });
 
         BufferedReader testBr = new BufferedReader(new FileReader(testFile));
-
 
         cbw.flush();
         cbw.close();
@@ -208,14 +235,10 @@ public class Application {
         return rst;
     }
 
-    public static IntSummaryStatistics getSummaryStatistics(String filename, Predicate<String> filter, Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
+    public static IntSummaryStatistics getSummaryStatistics(String filename, Predicate<String> filter,
+            Function<String, String> map, ToIntFunction<String> toInt) throws Exception {
         File file = new File(filename);
         BufferedReader br = new BufferedReader(new FileReader(file));
-        return br.lines()
-                .filter(filter)
-                .map(map)
-                .mapToInt(toInt)
-                .filter(val -> val > 0)
-                .summaryStatistics();
+        return br.lines().filter(filter).map(map).mapToInt(toInt).filter(val -> val > 0).summaryStatistics();
     }
 }
