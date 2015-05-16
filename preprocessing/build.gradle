@@ -13,7 +13,6 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile 'net.sf.opencsv:opencsv:2.3'
-    compile 'net.sf.uadetector:uadetector-resources:2014.10'
-    compile 'net.sf.uadetector:uadetector-core:0.9.22'
+    compile 'eu.bitwalker:UserAgentUtils:1.15'
     compile 'com.google.guava:guava:18.0'
 }

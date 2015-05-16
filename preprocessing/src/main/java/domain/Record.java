@@ -1,6 +1,6 @@
 package domain;
 
-import net.sf.uadetector.ReadableUserAgent;
+import eu.bitwalker.useragentutils.UserAgent;
 
 import java.util.Date;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
  * Created by study on 5/16/15.
  */
 public class Record {
-    private ReadableUserAgent ua;
+    private UserAgent ua;
     private String ip;
     private Date ts;
     private Map<String, Object> data;
@@ -32,7 +32,7 @@ public class Record {
 
     private String referer;
 
-    public Record(ReadableUserAgent ua, String ip, Date ts, Map<String, Object> data, int code, int bytes, String referer) {
+    public Record(UserAgent ua, String ip, Date ts, Map<String, Object> data, int code, int bytes, String referer) {
         this.setUa(ua);
         this.setIp(ip);
         this.setTs(ts);
@@ -42,11 +42,11 @@ public class Record {
         this.setReferer(referer);
     }
 
-    public ReadableUserAgent getUa() {
+    public UserAgent getUa() {
         return ua;
     }
 
-    public void setUa(ReadableUserAgent ua) {
+    public void setUa(UserAgent ua) {
         this.ua = ua;
     }
 

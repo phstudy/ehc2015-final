@@ -1,29 +1,16 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import domain.ProductRecord;
+import domain.Record;
+
+import java.io.*;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import domain.ProductRecord;
-import domain.Record;
 
 /**
  * Created by study on 5/14/15.
@@ -67,16 +54,18 @@ public class Application {
         searchTestBw.write("ip,ts,uid,keywords,eruid\n");
 
         // price
-        BufferedWriter pricebw = new BufferedWriter(new FileWriter(file("price.csv")));
+        BufferedWriter priceBw = new BufferedWriter(new FileWriter(file("price.csv")));
         Set<String> pricePids = new HashSet<>(200000);
 
         // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
         orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
-        BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("view.csv")));
+
+        // view
+        BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("train_view.csv")));
+        BufferedWriter viewTestBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
         viewBw.write("pid,ts,ip,uid,eruid\n");
-        BufferedWriter testViewBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
-        testViewBw.write("pid,ts,ip,uid,eruid\n");
+        viewTestBw.write("pid,ts,ip,uid,eruid\n");
         
 
         // datasets
@@ -100,7 +89,6 @@ public class Application {
 
                 //UserAgentStringParser parser = UADetectorServiceFactory.getResourceModuleParser();
                 //ReadableUserAgent agent = parser.parse(matcher.group(10));
-
                 Record rec = new Record(null, ip, ts, data, code, bytes, referer);
 
                 // generate category dataset
@@ -137,7 +125,7 @@ public class Application {
                             pricePids.add(productRecord.getPid());
 
                             try {
-                                pricebw.write(productRecord.getPid() + "," + productRecord.getPrice() + "\n");
+                                priceBw.write(productRecord.getPid() + "," + productRecord.getPrice() + "\n");
                             } catch (Exception e) {
                                 System.out.println(rec);
                                 e.printStackTrace();
@@ -182,9 +170,7 @@ public class Application {
                 int bytes = Integer.parseInt(matcher.group(8));
                 String referer = matcher.group(9);
 
-                //UserAgentStringParser parser = UADetectorServiceFactory.getResourceModuleParser();
-                //ReadableUserAgent agent = parser.parse(matcher.group(10));
-
+                //UserAgent agent = UserAgent.parseUserAgentString(matcher.group(10));
                 Record rec = new Record(null, ip, ts, data, code, bytes, referer);
 
                 // generate category dataset
@@ -228,30 +214,41 @@ public class Application {
                 }
                 
                 if ("view".equals(rec.getAct())){
-                    extractViewRecord(testViewBw, rec);
+                    extractViewRecord(viewTestBw, rec);
                 }
             }
         });
 
+        // category
         categoryBw.flush();
         categoryBw.close();
-
         categoryTestBw.flush();
         categoryTestBw.close();
 
+        // search
+        searchBw.flush();
+        searchBw.close();
         searchTestBw.flush();
         searchTestBw.close();
 
-        pricebw.flush();
-        pricebw.close();
+        // price
+        priceBw.flush();
+        priceBw.close();
 
+        // order
+        orderBw.flush();
+        orderBw.close();
+
+        // view
+        viewBw.flush();
+        viewBw.close();
+        viewTestBw.flush();
+        viewTestBw.close();
+
+        // dataset
         trainBr.close();
         testBr.close();
-        
-        orderBw.close();
-        viewBw.close();
-        testViewBw.close();
-        searchBw.close();
+
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Category.containCategory, Category.toCategory, Category.toCount));
@@ -341,7 +338,7 @@ public class Application {
                     value = URLDecoder.decode(value, "UTF-8");
                     value = URLDecoder.decode(value, "UTF-8");
                     value = URLDecoder.decode(value, "UTF-8");
-                    value.replace(',', '|');
+                    value = value.replace(',', '|');
                     object = value;
                 } catch (Exception e) {
                     e.printStackTrace();
