@@ -72,7 +72,7 @@ public class Application {
         
         
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
-        orderBw.write("pid,price,num,uid,erUid\n");
+        orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
 
         trainBr.lines().forEach(line -> {
             Matcher matcher = pattern.matcher(line);
@@ -157,12 +157,15 @@ public class Application {
                     // erUid=6c685cbe-cc40-609a-3da2-d48e4ed7b771}, code=302, bytes=160, referer='-'}
 
                     Object uid = orderData.get("uid");
-                    Object erUid = orderData.get("erUid");
+                    Object erUid = orderData.get("eruid");
+                    
                     StringBuilder sb = new StringBuilder();
                     plist.forEach(productRecord -> {
                         sb.setLength(0);
-                        // pid,price,num,uid,erUid
+                        // pid,ts,ip,price,num,uid,eruid
                         sb.append(productRecord.getPid()).append(",");
+                        sb.append(rec.getTs().getTime()).append(",");
+                        sb.append(rec.getIp()).append(",");
                         sb.append(productRecord.getPrice()).append(",");
                         sb.append(productRecord.getNum()).append(",");
                         sb.append(uid).append(",");
