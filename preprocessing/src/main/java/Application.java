@@ -23,10 +23,10 @@ public class Application {
         Pattern pattern = Pattern.compile(regex);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
 
-        File file = new File("/Users/study/Desktop/EHC/EHC_2nd_round_train.log");
-        File categoryFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_train_category.csv");
-        File priceFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_train_price.csv");
-
+        File trainFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_train.log");
+        File testFile = new File("/Users/study/Desktop/EHC/EHC_2nd_round_test_clean.log");
+        File categoryFile = new File("/Users/study/Desktop/EHC/category.csv");
+        File priceFile = new File("/Users/study/Desktop/EHC/price.csv");
 
         BufferedWriter cbw = new BufferedWriter(new FileWriter(categoryFile));
         Set<String> cbw_pids = new HashSet<>(200000);
@@ -36,9 +36,9 @@ public class Application {
 
         cbw.write("pid,1_class,2_class,3_class,4_class,5_class\n");
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedReader trainBr = new BufferedReader(new FileReader(trainFile));
 
-        br.lines().forEach(line -> {
+        trainBr.lines().forEach(line -> {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
                 String ip = matcher.group(1);
@@ -102,12 +102,17 @@ public class Application {
             }
         });
 
+        BufferedReader testBr = new BufferedReader(new FileReader(testFile));
+
+
         cbw.flush();
         cbw.close();
 
         pbw.flush();
         pbw.close();
 
+        trainBr.close();
+        testBr.close();
 
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
