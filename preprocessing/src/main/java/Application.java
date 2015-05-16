@@ -251,6 +251,7 @@ public class Application {
         orderBw.close();
         viewBw.close();
         testViewBw.close();
+        searchBw.close();
         //UADetectorServiceFactory.getOnlineUpdatingParser().shutdown();
 
         //System.out.println(getSummaryStatistics("/Users/study/Desktop/EHC/EHC_2nd_round_train.log", Category.containCategory, Category.toCategory, Category.toCount));
