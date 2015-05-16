@@ -55,12 +55,7 @@ hive -e "
 DROP TABLE IF EXISTS price;
 CREATE TABLE price ( 
 	pid STRING, 
-	ts timestamp, 
-	ip STRING, 
-	price INT, 
-	num INT, 
-	uid STRING, 
-	eruid STRING
+	price INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/price.csv' OVERWRITE INTO TABLE price";
 
