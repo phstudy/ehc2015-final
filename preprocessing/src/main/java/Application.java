@@ -54,11 +54,16 @@ public class Application {
 
         File trainFile = file("EHC_2nd_round_train.log");
         File testFile = file("EHC_2nd_round_test_clean.log");
-        File categoryFile = file("category.csv");
+        File categoryFile = file("train_category.csv");
+        File testCategoryFile = file("test_category.csv");
+
         File priceFile = file("price.csv");
 
         BufferedWriter cbw = new BufferedWriter(new FileWriter(categoryFile));
         Set<String> cbw_pids = new HashSet<>(200000);
+
+        BufferedWriter tcbw = new BufferedWriter(new FileWriter(testCategoryFile));
+        Set<String> tcbw_pids = new HashSet<>(200000);
 
         BufferedWriter pbw = new BufferedWriter(new FileWriter(priceFile));
         Set<String> pbw_pids = new HashSet<>(200000);
@@ -90,7 +95,7 @@ public class Application {
                 // generate category dataset
                 if ("view".equals(rec.getAct())) {
                     String pid = (String) rec.getData().get("pid");
-                    if (!cbw_pids.contains(pid) || true) {
+                    if (!cbw_pids.contains(pid)) {
                         cbw_pids.add(pid);
 
                         List<String> categories = (List<String>) rec.getData().get("cat");
@@ -109,6 +114,7 @@ public class Application {
                             }
                             cbw.write(sb.toString());
                         } catch (Exception e) {
+                            System.out.println(rec);
                             e.printStackTrace();
                         }
                     }
@@ -123,6 +129,7 @@ public class Application {
                             try {
                                 pbw.write(productRecord.getPid() + "," + productRecord.getPrice() + "\n");
                             } catch (Exception e) {
+                                System.out.println(rec);
                                 e.printStackTrace();
                             }
                         }
@@ -132,9 +139,61 @@ public class Application {
         });
 
         BufferedReader testBr = new BufferedReader(new FileReader(testFile));
+        testBr.lines().forEach(line -> {
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                String ip = matcher.group(1);
+                Date ts = null;
+                try {
+                    ts = sdf.parse(matcher.group(4));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Map<String, Object> data = requestToMap(matcher.group(5));
+                int code = Integer.parseInt(matcher.group(7));
+                int bytes = Integer.parseInt(matcher.group(8));
+                String referer = matcher.group(9);
 
+                //UserAgentStringParser parser = UADetectorServiceFactory.getResourceModuleParser();
+                //ReadableUserAgent agent = parser.parse(matcher.group(10));
+
+                Record rec = new Record(null, ip, ts, data, code, bytes, referer);
+
+                // generate category dataset
+                if ("view".equals(rec.getAct())) {
+                    String pid = (String) rec.getData().get("pid");
+                    if (!tcbw_pids.contains(pid)) {
+                        tcbw_pids.add(pid);
+
+                        List<String> categories = (List<String>) rec.getData().get("cat");
+                        try {
+                            StringBuilder sb = new StringBuilder(20);
+                            sb.append(pid + ",");
+                            for (int i = 0; i < 5; i++) {
+                                if (i < categories.size()) {
+                                    sb.append(categories.get(i));
+                                }
+                                if (i == 4) {
+                                    sb.append("\n");
+                                } else {
+                                    sb.append(",");
+                                }
+                            }
+                            tcbw.write(sb.toString());
+                        } catch (Exception e) {
+                            System.out.println(rec);
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+        
         cbw.flush();
         cbw.close();
+
+        tcbw.flush();
+        tcbw.close();
 
         pbw.flush();
         pbw.close();
