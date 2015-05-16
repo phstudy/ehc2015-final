@@ -68,6 +68,7 @@ public class Application {
         // price
         BufferedWriter priceBw = new BufferedWriter(new FileWriter(file("price.csv")));
         Set<String> pricePids = new HashSet<String>(200000);
+        priceBw.write("pid,price\n");
 
         // order
         BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
