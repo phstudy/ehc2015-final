@@ -157,7 +157,7 @@ public class Application {
                     // erUid=6c685cbe-cc40-609a-3da2-d48e4ed7b771}, code=302, bytes=160, referer='-'}
 
                     Object uid = orderData.get("uid");
-                    Object erUid = orderData.get("eruid");
+                    Object erUid = orderData.get("erUid");
                     
                     StringBuilder sb = new StringBuilder();
                     plist.forEach(productRecord -> {
