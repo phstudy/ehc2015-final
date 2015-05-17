@@ -68,7 +68,8 @@ CREATE TABLE parquet_train_view (
 	ip STRING, 
 	uid STRING, 
 	eruid STRING,
-    eturec INT
+    eturec INT,
+    viewnum INT
 ) stored as parquetfile;
 insert into parquet_train_view select * from train_view";
 

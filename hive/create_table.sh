@@ -82,9 +82,10 @@ CREATE TABLE train_view (
 	ip STRING, 
 	uid STRING, 
 	eruid STRING,
-    eturec INT
+    eturec INT,
+    viewnum INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
-LOAD DATA LOCAL INPATH '/root/dataset/train_view.csv' OVERWRITE INTO TABLE train_view";
+LOAD DATA LOCAL INPATH '/root/dataset/train_merge_view.csv' OVERWRITE INTO TABLE train_view";
 
 echo 'create train_view_order table'
 hive -e "
