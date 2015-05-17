@@ -13,7 +13,7 @@ CREATE TABLE parquet_train_category (
 ) stored as parquetfile;
 insert into parquet_train_category select * from train_category;"
 
-echo 'create parquet_train_category table'
+echo 'create parquet_test_category table'
 impala-shell -q "
 DROP TABLE IF EXISTS parquet_test_category;
 CREATE TABLE parquet_test_category ( 
@@ -71,7 +71,7 @@ CREATE TABLE parquet_train_view (
 ) stored as parquetfile;
 insert into parquet_train_view select * from train_view";
 
-echo 'create parquet_train_view table'
+echo 'create parquet_train_view_order table'
 impala-shell -q "
 DROP TABLE IF EXISTS parquet_train_view_order;
 CREATE TABLE parquet_train_view_order ( 
@@ -87,12 +87,12 @@ insert into parquet_train_view_order select * from train_view_order";
 
 echo 'create parquet_test_view table'
 impala-shell -q "
-DROP TABLE IF EXISTS parquet_train_view;
-CREATE TABLE parquet_train_view ( 
+DROP TABLE IF EXISTS parquet_test_view;
+CREATE TABLE parquet_test_view ( 
 	pid STRING, 
 	ts timestamp, 
 	ip STRING, 
 	uid STRING, 
 	eruid STRING
 ) stored as parquetfile;
-insert into parquet_train_view select * from test_view";
+insert into parquet_test_view select * from test_view";
