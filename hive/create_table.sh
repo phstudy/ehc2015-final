@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+echo 'create train_order table'
+hive -e "
+DROP TABLE IF EXISTS train_order;
+CREATE TABLE train_order (
+        pid STRING,
+        ts timestamp,
+        ip STRING,
+        price INT,
+        num INT,
+        uid STRING,
+        eruid STRING
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
+LOAD DATA LOCAL INPATH '/root/dataset/order.csv' OVERWRITE INTO TABLE train_order";
+
 echo 'create train_category table'
 hive -e "
 DROP TABLE IF EXISTS train_category;
