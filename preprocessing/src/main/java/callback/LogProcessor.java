@@ -1,3 +1,5 @@
+package callback;
+
 import domain.Record;
 
 public interface LogProcessor<T> {
