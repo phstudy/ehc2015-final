@@ -1,23 +1,15 @@
+import domain.ProductRecord;
+import domain.Record;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import domain.ProductRecord;
-import domain.Record;
 
 /**
  * Created by study on 5/14/15.
@@ -41,7 +33,8 @@ public class Application {
         Pattern pattern = Pattern.compile(regex);
 
         // category
-        BufferedWriter categoryBw = FileManager.fileAsWriter("train_category.csv"); 
+        BufferedWriter categoryOnlyBw = FileManager.fileAsWriter("category_only.csv");
+        BufferedWriter categoryBw = FileManager.fileAsWriter("train_category.csv");
         BufferedWriter categoryTestBw = FileManager.fileAsWriter("test_category.csv");
         Set<String> categoryPids = new HashSet<String>(200000);
         Set<String> categoryTestPids = new HashSet<String>(200000);
@@ -84,7 +77,7 @@ public class Application {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Map<String, Object> data = requestToMap(matcher.group(5));
+                Map<String, Object> data = requestToMap(categoryOnlyBw, matcher.group(5));
                 int code = Integer.parseInt(matcher.group(7));
                 int bytes = Integer.parseInt(matcher.group(8));
                 String referer = matcher.group(9);
@@ -168,7 +161,7 @@ public class Application {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Map<String, Object> data = requestToMap(matcher.group(5));
+                Map<String, Object> data = requestToMap(categoryOnlyBw, matcher.group(5));
                 int code = Integer.parseInt(matcher.group(7));
                 int bytes = Integer.parseInt(matcher.group(8));
                 String referer = matcher.group(9);
@@ -293,7 +286,7 @@ public class Application {
         }
     }
 
-    public static Map<String, Object> requestToMap(String str) {
+    public static Map<String, Object> requestToMap(BufferedWriter categoryOnlyBw, String str) {
         Map<String, Object> rst = new HashMap<String, Object>(10);
         int lastChar = str.charAt(str.length() - 1);
         if (lastChar == ';') {
@@ -322,6 +315,11 @@ public class Application {
                 }
             }
             if ("cat".equals(key)) {
+                try {
+                    categoryOnlyBw.write(value + "\n");
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
                 object = categoryToList(value);
             }
 

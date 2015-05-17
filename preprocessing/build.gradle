@@ -29,4 +29,5 @@ dependencies {
     compile 'net.sf.opencsv:opencsv:2.3'
     compile 'eu.bitwalker:UserAgentUtils:1.15'
     compile 'com.google.guava:guava:18.0'
+    compile 'net.sourceforge.htmlunit:htmlunit:2.15'
 }
