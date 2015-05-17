@@ -2,7 +2,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import callback.CSVProcessor;
 
@@ -44,11 +46,17 @@ public class JoinViewOrder {
             }
         }, erUidPidViewCount);
 
+        final Set<String> dataHasProcessed = new HashSet<String>();
         new DataProcessor(FileManager.fileAsReader("train_view.csv")).process(new CSVProcessor<Writer>() {
 
             @Override
             public void process(String[] csv, Writer writer) throws Exception {
                 String key = csv[4] + "" + csv[0];
+
+                if (dataHasProcessed.contains(key)) {
+                    return;
+                }
+
                 ArrayList<String> l = new ArrayList<String>();
                 l.addAll(Arrays.asList(csv));
                 if (erUidPidBuyNums.containsKey(key)) {
@@ -67,6 +75,7 @@ public class JoinViewOrder {
                 }
 
                 writer.write(Joiner.on(",").join(l) + "\n");
+                dataHasProcessed.add(key);
             }
         }, FileManager.fileAsWriter("train_view_order.csv"));
 
