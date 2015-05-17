@@ -94,6 +94,7 @@ CREATE TABLE train_view_order (
         ip STRING,
         uid STRING,
         eruid STRING,
+        eturec INT,
         buy INT,
         num INT,
         viewnum INT

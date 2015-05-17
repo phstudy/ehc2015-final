@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+
 import domain.ProductRecord;
 import domain.Record;
 
@@ -284,7 +286,9 @@ public class Application {
         viewSb.append(targetSdf.format(rec.getTs())).append(",");
         viewSb.append(rec.getIp()).append(",");
         viewSb.append(uid).append(",");
-        viewSb.append(erUid).append("\n");
+        viewSb.append(erUid).append(",");
+        String eturec = orderData.get("eturec") == null ? "0" : "1";
+        viewSb.append(eturec).append("\n");
 
         try {
             viewBw.write(viewSb.toString());
