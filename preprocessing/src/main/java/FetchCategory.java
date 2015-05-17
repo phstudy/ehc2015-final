@@ -23,6 +23,7 @@ public class FetchCategory {
     static BufferedWriter categoryBw;
     static AtomicInteger cnt = new AtomicInteger(0);
     static String bashUrl = "http://shopping.udn.com/mall/cus/cat/Cc1c01.do?dc_cateid_0=";
+    static int bashUrlLength = bashUrl.length();
     static Set<String> cids = new HashSet<String>();
 
     public static void main(String[] args) throws Exception {
@@ -52,6 +53,7 @@ public class FetchCategory {
 
         categoryBw.flush();
         categoryBw.close();
+        pool.shutdown();
     }
 
     public static class Task implements Runnable {
@@ -72,6 +74,7 @@ public class FetchCategory {
                     idx = part.lastIndexOf("_");
 
                     if (!cids.contains(part)) {
+                        cids.add(part);
                         String url = bashUrl + part;
 
                         WebClient webClient = new WebClient(BrowserVersion.FIREFOX_24);
@@ -89,11 +92,53 @@ public class FetchCategory {
                                 DomElement span = it.next();
                                 String categoryName = span.getTextContent().trim();
                                 if (href.contains(bashUrl)) {
-                                    String cid = href.replace(bashUrl, "");
-                                    if (!cids.contains(cid)) {
+                                    String cid = href.substring(bashUrlLength);
+                                    if (!cids.contains(cid) && !categoryName.isEmpty()) {
                                         cids.add(cid);
                                         categoryBw.write(cid + "," + categoryName + "\n");
                                     }
+                                }
+                            }
+                        }
+
+                        anchors = (List<HtmlAnchor>) page.getByXPath("/html/body//a");
+                        for (int i = 0; i < anchors.size(); i++) {
+                            HtmlAnchor anchor = anchors.get(i);
+                            String href = anchor.getHrefAttribute();
+                            String categoryName = anchor.getTextContent().trim();
+                            if(categoryName.isEmpty()) { // image
+                                Iterator<DomElement> it = anchor.getChildElements().iterator();
+                                while (it.hasNext()) {
+                                    DomElement img = it.next();
+                                    categoryName = img.getAttribute("title").trim();
+                                    categoryName = categoryName.replace(",", "，");
+                                    if (href.contains(bashUrl) && !categoryName.isEmpty()) {
+                                        String cid = href;
+                                        int andIdx = cid.indexOf("&");
+                                        if(andIdx > 0) {
+                                            cid = href.substring(bashUrlLength, andIdx);
+                                        } else {
+                                            cid = href.substring(bashUrlLength);
+                                        }
+                                        if (!cids.contains(cid)) {
+                                            cids.add(cid);
+                                            categoryBw.write(cid + "," + categoryName + "\n");
+                                        }
+                                    }
+                                }
+                            }
+                            else if(href.contains(bashUrl)) {
+                                categoryName = categoryName.replace(",", "，");
+                                String cid = href;
+                                int andIdx = cid.indexOf("&");
+                                if(andIdx > 0) {
+                                    cid = href.substring(bashUrlLength, andIdx);
+                                } else {
+                                    cid = href.substring(bashUrlLength);
+                                }
+                                if (!cids.contains(cid) && !categoryName.isEmpty()) {
+                                    cids.add(cid);
+                                    categoryBw.write(cid + "," + categoryName + "\n");
                                 }
                             }
                         }
