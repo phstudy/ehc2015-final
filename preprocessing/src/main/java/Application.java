@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,37 +41,37 @@ public class Application {
         Pattern pattern = Pattern.compile(regex);
 
         // category
-        BufferedWriter categoryBw = new BufferedWriter(new FileWriter(file("train_category.csv")));
-        BufferedWriter categoryTestBw = new BufferedWriter(new FileWriter(file("test_category.csv")));
+        BufferedWriter categoryBw = FileManager.fileAsWriter("train_category.csv"); 
+        BufferedWriter categoryTestBw = FileManager.fileAsWriter("test_category.csv");
         Set<String> categoryPids = new HashSet<String>(200000);
         Set<String> categoryTestPids = new HashSet<String>(200000);
         //categoryBw.write("pid,class1,class2,class3,class4,class5\n");
         //categoryTestBw.write("pid,class1,class2,class3,class4,class5\n");
 
         // search
-        BufferedWriter searchBw = new BufferedWriter(new FileWriter(file("train_search.csv")));
-        BufferedWriter searchTestBw = new BufferedWriter(new FileWriter(file("test_search.csv")));
+        BufferedWriter searchBw = FileManager.fileAsWriter("train_search.csv");
+        BufferedWriter searchTestBw = FileManager.fileAsWriter("test_search.csv");
         //searchBw.write("ip,ts,uid,keywords,eruid\n");
         //searchTestBw.write("ip,ts,uid,keywords,eruid\n");
 
         // price
-        BufferedWriter priceBw = new BufferedWriter(new FileWriter(file("price.csv")));
+        BufferedWriter priceBw = FileManager.fileAsWriter("price.csv");
         Set<String> pricePids = new HashSet<String>(200000);
         //priceBw.write("pid,price\n");
 
         // order
-        BufferedWriter orderBw = new BufferedWriter(new FileWriter(file("order.csv")));
+        BufferedWriter orderBw = FileManager.fileAsWriter("order.csv");
         //orderBw.write("pid,ts,ip,price,num,uid,eruid\n");
 
         // view
-        BufferedWriter viewBw = new BufferedWriter(new FileWriter(file("train_view.csv")));
-        BufferedWriter viewTestBw = new BufferedWriter(new FileWriter(file("test_view.csv")));
+        BufferedWriter viewBw = FileManager.fileAsWriter("train_view.csv");
+        BufferedWriter viewTestBw = FileManager.fileAsWriter("test_view.csv");
         //viewBw.write("pid,ts,ip,uid,eruid\n");
         //viewTestBw.write("pid,ts,ip,uid,eruid\n");
 
         // datasets
-        BufferedReader trainBr = new BufferedReader(new FileReader(file("EHC_2nd_round_train.log")));
-        BufferedReader testBr = new BufferedReader(new FileReader(file("EHC_2nd_round_test_clean.log")));
+        BufferedReader trainBr = FileManager.fileAsReader("EHC_2nd_round_train.log");
+        BufferedReader testBr = FileManager.fileAsReader("EHC_2nd_round_test_clean.log");
 
         String line;
         while ((line = trainBr.readLine()) != null) {
@@ -224,36 +222,6 @@ public class Application {
                 }
             }
         }
-
-        // category
-        categoryBw.flush();
-        categoryBw.close();
-        categoryTestBw.flush();
-        categoryTestBw.close();
-
-        // search
-        searchBw.flush();
-        searchBw.close();
-        searchTestBw.flush();
-        searchTestBw.close();
-
-        // price
-        priceBw.flush();
-        priceBw.close();
-
-        // order
-        orderBw.flush();
-        orderBw.close();
-
-        // view
-        viewBw.flush();
-        viewBw.close();
-        viewTestBw.flush();
-        viewTestBw.close();
-
-        // dataset
-        trainBr.close();
-        testBr.close();
 
         final long endTime = System.currentTimeMillis();
         System.out.println("done: " + new Date());
