@@ -93,7 +93,9 @@ CREATE TABLE train_view_order (
         ts timestamp,
         ip STRING,
         uid STRING,
-        eruid STRING
+        eruid STRING,
+        buy INT,
+        num INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/train_view_order.csv' OVERWRITE INTO TABLE train_view_order";
 

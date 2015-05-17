@@ -22,7 +22,7 @@ public class JoinViewOrder {
             }
         }, erUidPidNums);
 
-        new DataProcessor(FileManager.fileAsReader("view.csv")).process(new CSVProcessor<Writer>() {
+        new DataProcessor(FileManager.fileAsReader("train_view.csv")).process(new CSVProcessor<Writer>() {
 
             @Override
             public void process(String[] csv, Writer writer) throws Exception {
