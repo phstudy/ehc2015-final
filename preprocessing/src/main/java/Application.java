@@ -26,20 +26,11 @@ import domain.Record;
  */
 public class Application {
 
-    static String baseDir = "/Users/study/Desktop/EHC";
     static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
     static SimpleDateFormat targetSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
-    static {
-        String preferedBaseDir = System.getProperty("EHC_FINAL_DATASET_DIR");
-        if (preferedBaseDir != null && new File(preferedBaseDir).exists() && new File(preferedBaseDir).isDirectory()) {
-            baseDir = new File(preferedBaseDir).getAbsolutePath();
-            System.err.println("reset base-dir as " + baseDir);
-        }
-    }
-
     static File file(String name) {
-        return new File(baseDir, name);
+        return FileManager.file(name);
     }
 
     public static void main(String[] args) throws Exception {
