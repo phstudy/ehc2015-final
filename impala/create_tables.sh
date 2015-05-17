@@ -71,6 +71,20 @@ CREATE TABLE parquet_train_view (
 ) stored as parquetfile;
 insert into parquet_train_view select * from train_view";
 
+echo 'create parquet_train_view table'
+impala-shell -q "
+DROP TABLE IF EXISTS parquet_train_view_order;
+CREATE TABLE parquet_train_view_order ( 
+	pid STRING, 
+	ts timestamp, 
+	ip STRING, 
+	uid STRING, 
+	eruid STRING,
+    buy INT,
+    num INT
+) stored as parquetfile;
+insert into parquet_train_view_order select * from train_view_order";
+
 echo 'create parquet_test_view table'
 impala-shell -q "
 DROP TABLE IF EXISTS parquet_train_view;
