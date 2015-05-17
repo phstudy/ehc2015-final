@@ -96,7 +96,7 @@ CREATE TABLE train_view_order (
         eruid STRING,
         buy INT,
         num INT,
-        view INT
+        viewnum INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/train_view_order.csv' OVERWRITE INTO TABLE train_view_order";
 
