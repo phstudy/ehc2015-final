@@ -67,7 +67,8 @@ CREATE TABLE parquet_train_view (
 	ts timestamp, 
 	ip STRING, 
 	uid STRING, 
-	eruid STRING
+	eruid STRING,
+    eturec INT
 ) stored as parquetfile;
 insert into parquet_train_view select * from train_view";
 
@@ -95,6 +96,7 @@ CREATE TABLE parquet_test_view (
 	ts timestamp, 
 	ip STRING, 
 	uid STRING, 
-	eruid STRING
+	eruid STRING,
+    eturec INT
 ) stored as parquetfile;
 insert into parquet_test_view select * from test_view";

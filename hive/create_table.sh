@@ -81,7 +81,8 @@ CREATE TABLE train_view (
 	ts timestamp, 
 	ip STRING, 
 	uid STRING, 
-	eruid STRING
+	eruid STRING,
+    eturec INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/train_view.csv' OVERWRITE INTO TABLE train_view";
 
@@ -109,6 +110,7 @@ CREATE TABLE test_view (
 	ts timestamp, 
 	ip STRING, 
 	uid STRING, 
-	eruid STRING
+	eruid STRING,
+	eturec INT
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/test_view.csv' OVERWRITE INTO TABLE test_view";
