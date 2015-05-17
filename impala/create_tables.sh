@@ -81,7 +81,8 @@ CREATE TABLE parquet_train_view_order (
 	uid STRING, 
 	eruid STRING,
     buy INT,
-    num INT
+    num INT,
+    view INT
 ) stored as parquetfile;
 insert into parquet_train_view_order select * from train_view_order";
 
