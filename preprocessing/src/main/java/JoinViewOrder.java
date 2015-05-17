@@ -43,7 +43,7 @@ public class JoinViewOrder {
 
                 writer.write(Joiner.on(",").join(l) + "\n");
             }
-        }, FileManager.fileAsWriter("viewOrderJoin.csv"));
+        }, FileManager.fileAsWriter("train_view_order.csv"));
 
     }
 

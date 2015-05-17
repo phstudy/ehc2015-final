@@ -85,6 +85,18 @@ CREATE TABLE train_view (
 ) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
 LOAD DATA LOCAL INPATH '/root/dataset/train_view.csv' OVERWRITE INTO TABLE train_view";
 
+echo 'create train_view_order table'
+hive -e "
+DROP TABLE IF EXISTS train_view_order;
+CREATE TABLE train_view_order (
+        pid STRING,
+        ts timestamp,
+        ip STRING,
+        uid STRING,
+        eruid STRING
+) ROW FORMAT DELIMITED FIELDS TERMINATED BY \",\";
+LOAD DATA LOCAL INPATH '/root/dataset/train_view_order.csv' OVERWRITE INTO TABLE train_view_order";
+
 echo 'create test_view table'
 hive -e "
 DROP TABLE IF EXISTS test_view;
