@@ -43,7 +43,7 @@ public class ExtractorUtils {
 //        }
 
         int catIdx = line.indexOf("cat=", MIN_CATEGORY_POS);
-        String cids = "";
+        String cids = ",,,,";
         if (catIdx != -1) {
             int endCatIdx = line.indexOf(";", catIdx + 4);
             cids = line.substring(catIdx + 4, endCatIdx);
@@ -56,7 +56,7 @@ public class ExtractorUtils {
             StringBuilder sb = new StringBuilder(49);
             sb.append(cparts[0]);
             for (int i = 1; i < cparts.length; i++) {
-                sb.append(",").append(cparts[0] + cparts[i]);
+                sb.append(",").append(cparts[0]).append(cparts[i]);
             }
             for (int i = cparts.length; i <= 4; i++) {
                 sb.append(",");
@@ -76,7 +76,7 @@ public class ExtractorUtils {
             endEruidIdx = line.indexOf(" ", eruidIdx);
         }
 
-        return line.substring(eruidIdx + 9, eruidIdx + 20) + line.charAt(endEruidIdx - 1);
+        return (line.substring(eruidIdx + 9, eruidIdx + 20) + line.charAt(endEruidIdx - 1)).replace("-", "");
     }
 
     public static String extractPlist(String line) {

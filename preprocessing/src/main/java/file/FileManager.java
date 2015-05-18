@@ -1,3 +1,5 @@
+package file;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -31,7 +33,7 @@ public class FileManager {
         });
     }
 
-    static File file(String name) {
+    public static File file(String name) {
         return new File(baseDir, name);
     }
 
@@ -41,7 +43,7 @@ public class FileManager {
         return reader;
     }
 
-    static BufferedWriter fileAsWriter(String name) throws Exception {
+    public static BufferedWriter fileAsWriter(String name) throws Exception {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file(name)));
         managedResources.add(writer);
         return writer;

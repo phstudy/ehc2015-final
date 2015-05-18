@@ -7,7 +7,7 @@ import java.util.Locale;
 /**
  * Created by study on 5/18/15.
  */
-public class Date {
+public class DateGenerator {
     public static void main(String[] args) {
         Calendar cal = Calendar.getInstance(Locale.TAIWAN);
         cal.set(2015, Calendar.FEBRUARY, 1, 0, 0, 0);
@@ -21,8 +21,6 @@ public class Date {
 
             System.out.println(String.format("weeks.put(\"%02d", cal.get(Calendar.DATE)) + "/" + month + "\",\"" + weekDay + "\");");
             cal.add(Calendar.DATE, 1);
-
-
         }
     }
 }

@@ -38,6 +38,10 @@ public class WeekUtil {
         weeks.put("26/Feb", "Thu");
         weeks.put("27/Feb", "Fri");
         weeks.put("28/Feb", "Sat");
+
+        weeks.put("29/Feb", "Sun"); // ?
+        weeks.put("30/Feb", "Mon"); // ?
+
         weeks.put("01/Mar", "Sun");
         weeks.put("02/Mar", "Mon");
         weeks.put("03/Mar", "Tue");
