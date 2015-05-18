@@ -13,10 +13,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.base.Optional;
 
 import domain.ProductRecord;
 import domain.Record;
@@ -34,6 +35,16 @@ public class Application {
     }
 
     public static void main(String[] args) throws Exception {
+
+        int corePoolSize = 8;
+        int maximumPoolSize = 20;
+        long keepAliveTime = 60;
+        int capacity = 100;
+
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>(capacity),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+
 
         final long startTime = System.currentTimeMillis();
         System.out.println("start: " + new Date());
