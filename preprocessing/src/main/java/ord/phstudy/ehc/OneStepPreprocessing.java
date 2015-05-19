@@ -6,7 +6,7 @@ import file.FileManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.util.Date;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +27,6 @@ public class OneStepPreprocessing {
 
     final static Set<String> eruids = Sets.newHashSet();
 
-
     public static void main(String[] args) throws Exception {
         int corePoolSize = 3;
         int maximumPoolSize = 3;
@@ -45,55 +44,36 @@ public class OneStepPreprocessing {
         BufferedWriter trainBw = FileManager.fileAsWriter("train.csv");
         BufferedWriter testBw = FileManager.fileAsWriter("test.csv");
 
+        // Train Dataset
         String line;
         while ((line = trainBr.readLine()) != null) {
             pool.execute(new Task(line, true));
         }
-
-        Set<String> keys = records.keySet();
-        Iterator<String> it = keys.iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            Record record = records.get(key);
-            String pid = record.pid;
-            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
-                record.cid = categories.get(pid);
-            }
-            trainBw.write(record.toString() + "\n");
+        while (pool.getTaskCount() != pool.getCompletedTaskCount()) {
+            System.err.println("count=" + pool.getTaskCount() + "," + pool.getCompletedTaskCount());
+            Thread.sleep(1000);
         }
-        records.clear();
+        writeTrainDataset(trainBw);
 
         long endTime = System.currentTimeMillis();
-        System.out.println("done: " + new Date());
-        System.out.println("Total execution time: " + (endTime - startTime));
+        System.out.println("Training dataset generation took " + (endTime - startTime) + " ms");
 
+
+        // Test Dataset
+        startTime = System.currentTimeMillis();
         while ((line = testBr.readLine()) != null) {
             pool.execute(new Task(line, false));
         }
-
+        while (pool.getTaskCount() != pool.getCompletedTaskCount()) {
+            System.err.println("count=" + pool.getTaskCount() + "," + pool.getCompletedTaskCount());
+            Thread.sleep(1000);
+        }
+        writeTestDataset(testBw);
         pool.shutdown();
 
-
-        keys = records.keySet();
-        it = keys.iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            Record record = records.get(key);
-            String pid = record.pid;
-            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
-                record.cid = categories.get(pid);
-            }
-            Integer p = prices.get(pid);
-            if (p != null) {
-                record.price = p;
-            }
-
-            testBw.write(record.toString() + "\n");
-        }
-
         endTime = System.currentTimeMillis();
-        System.out.println("done: " + new Date());
-        System.out.println("Total execution time: " + (endTime - startTime));
+        System.out.println("Testing dataset generation took " + (endTime - startTime) + " ms");
+
 
         // no op -> 6 secs
         // 1 thread no op -> 8 secs
@@ -129,118 +109,165 @@ public class OneStepPreprocessing {
             int type = line.charAt(actIdx + 4);
 
             if (type == 'v') { // view
-                String pid = ExtractorUtils.extractPid(line);
-                if (pid.isEmpty()) {
-                    return;
-                }
-                String eruid = ExtractorUtils.extractEruid(line);
+                processView(line, isTrain);
+            } else if (type == 's') { // search
+                return;
+            } else if (type == 'c') { // cart
+                processCart(line, isTrain);
+            } else if (type == 'o') { // order
+                processOrder(line, isTrain);
+            }
+        }
+    }
+
+    public static void writeTrainDataset(BufferedWriter bw) throws IOException {
+        Set<String> keys = records.keySet();
+        Iterator<String> it = keys.iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            Record record = records.get(key);
+            String pid = record.pid;
+            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
+                record.cid = categories.get(pid);
+            }
+            bw.write(record.toString() + "\n");
+        }
+        records.clear();
+    }
+
+    public static void writeTestDataset(BufferedWriter bw) throws IOException {
+        Set<String> keys = records.keySet();
+        Iterator<String> it = keys.iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            Record record = records.get(key);
+            String pid = record.pid;
+            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
+                record.cid = categories.get(pid);
+            }
+            Integer p = prices.get(pid);
+            if (p != null) {
+                record.price = p;
+            }
+
+            bw.write(record.toString() + "\n");
+        }
+    }
+
+    public static void processView(String line, boolean isTrain) {
+        String pid = ExtractorUtils.extractPid(line);
+        if (pid.isEmpty()) {
+            return;
+        }
+        String eruid = ExtractorUtils.extractEruid(line);
+        String key = pid + eruid;
+
+        Record record;
+
+        if (records.containsKey(key)) {
+            record = records.get(key);
+            record.hour = ExtractorUtils.extractHour(line);
+            record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
+            record.viewnum++;
+        } else {
+            record = new Record();
+            record.isTrain = isTrain;
+            record.cid = ExtractorUtils.extractCategory(line);
+            record.pid = pid;
+            record.uid = ExtractorUtils.extractUid(line);
+            //record.ip = ExtractorUtils.extractIp(line);
+            //record.ua = extractUserAgent(line);
+            record.eturec = ExtractorUtils.extractEturec(line);
+            record.eruid = eruid;
+            record.hour = ExtractorUtils.extractHour(line);
+            record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
+
+            if (!record.cid.isEmpty()) {
+                categories.put(record.pid, record.cid);
+            }
+
+            records.put(key, record);
+        }
+    }
+
+
+    public static void processCart(String line, boolean isTrain) {
+        String eruid = ExtractorUtils.extractEruid(line);
+        String plist = ExtractorUtils.extractPlist(line);
+        String[] products = plist.split(",");
+
+        if (products.length > 1) { // has Product ?
+            int mod = products.length % 3;
+            int len = products.length - mod; // 2 records miss price
+
+            for (int i = 0; i < len; i += 3) {
+                String pid = products[i];
                 String key = pid + eruid;
+                short num = Short.parseShort(products[i + 1]);
+                int price = Integer.parseInt(products[i + 2]);
+
+                if (!prices.containsKey(pid)) {
+                    prices.put(pid, price);
+                }
 
                 Record record;
-
                 if (records.containsKey(key)) {
                     record = records.get(key);
-                    record.hour = ExtractorUtils.extractHour(line);
-                    record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
-                    record.viewnum++;
+                    record.num = num;
+                    record.price = price;
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
-                    record.cid = ExtractorUtils.extractCategory(line);
                     record.pid = pid;
+                    record.num = num;
+                    record.price = price;
                     record.uid = ExtractorUtils.extractUid(line);
                     //record.ip = ExtractorUtils.extractIp(line);
                     //record.ua = extractUserAgent(line);
-                    record.buy = 'N';
-                    record.etured = ExtractorUtils.extractEturec(line);
                     record.eruid = eruid;
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
-
-                    if (!record.cid.isEmpty()) {
-                        categories.put(record.pid, record.cid);
-                    }
-
-                    records.put(key, record);
                 }
-            } else if (type == 's') { // search
-                return;
-            } else if (type == 'c') { // order
-                String eruid = ExtractorUtils.extractEruid(line);
-                String plist = ExtractorUtils.extractPlist(line);
-                String[] products = plist.split(",");
-                int mod = products.length % 3;
-                int len = products.length - mod;
+            }
+        }
+    }
 
-                if (products.length > 1) {
-                    for (int i = 0; i < len; i += 3) {
-                        String pid = products[i];
-                        String key = pid + eruid;
-                        short num = Short.parseShort(products[i + 1]);
-                        int price = Integer.parseInt(products[i + 2]);
 
-                        if (!prices.containsKey(pid)) {
-                            prices.put(pid, price);
-                        }
+    public static void processOrder(String line, boolean isTrain) {
+        String eruid = ExtractorUtils.extractEruid(line);
+        String plist = ExtractorUtils.extractPlist(line);
+        String[] products = plist.split(",");
 
-                        Record record;
-                        if (records.containsKey(key)) {
-                            record = records.get(key);
-                            record.num = num;
-                            record.price = price;
-                        } else {
-                            record = new Record();
-                            record.isTrain = isTrain;
-                            record.pid = pid;
-                            record.num = num;
-                            record.price = price;
-                            record.uid = ExtractorUtils.extractUid(line);
-                            //record.ip = ExtractorUtils.extractIp(line);
-                            //record.ua = extractUserAgent(line);
-                            record.eruid = eruid;
-                            record.hour = ExtractorUtils.extractHour(line);
-                            record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
-                        }
-                    }
+        if (products.length > 1) { // has Product ?
+            for (int i = 0; i < products.length; i += 3) {
+                String pid = products[i];
+                String key = pid + eruid;
+                short num = Short.parseShort(products[i + 1]);
+                int price = Integer.parseInt(products[i + 2]);
+
+                if (!prices.containsKey(pid)) {
+                    prices.put(pid, price);
                 }
 
-            } else if (type == 'o') { // order
-                String eruid = ExtractorUtils.extractEruid(line);
-                String plist = ExtractorUtils.extractPlist(line);
-                String[] products = plist.split(",");
-
-                if (products.length > 1) {
-                    for (int i = 0; i < products.length; i += 3) {
-                        String pid = products[i];
-                        String key = pid + eruid;
-                        short num = Short.parseShort(products[i + 1]);
-                        int price = Integer.parseInt(products[i + 2]);
-
-                        if (!prices.containsKey(pid)) {
-                            prices.put(pid, price);
-                        }
-
-                        Record record;
-                        if (records.containsKey(key)) {
-                            record = records.get(key);
-                            record.num = num;
-                            record.price = price;
-                            record.buy = 'Y';
-                        } else {
-                            record = new Record();
-                            record.isTrain = isTrain;
-                            record.pid = pid;
-                            record.num = num;
-                            record.price = price;
-                            record.uid = ExtractorUtils.extractUid(line);
-                            //record.ip = ExtractorUtils.extractIp(line);
-                            //record.ua = extractUserAgent(line);
-                            record.buy = 'Y';
-                            record.eruid = eruid;
-                            record.hour = ExtractorUtils.extractHour(line);
-                            record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
-                        }
-                    }
+                Record record;
+                if (records.containsKey(key)) {
+                    record = records.get(key);
+                    record.num = num;
+                    record.price = price;
+                    record.buy = 'Y';
+                } else {
+                    record = new Record();
+                    record.isTrain = isTrain;
+                    record.pid = pid;
+                    record.num = num;
+                    record.price = price;
+                    record.uid = ExtractorUtils.extractUid(line);
+                    //record.ip = ExtractorUtils.extractIp(line);
+                    //record.ua = extractUserAgent(line);
+                    record.buy = 'Y';
+                    record.eruid = eruid;
+                    record.hour = ExtractorUtils.extractHour(line);
+                    record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
                 }
             }
         }
