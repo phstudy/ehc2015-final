@@ -252,7 +252,7 @@ public class OneStepPreprocessing {
                 Record record;
                 if (records.containsKey(key)) {
                     record = records.get(key);
-                    record.num = num;
+                    record.num += num; // same order sometimes appears multiple times...
                     record.price = price;
                     record.buy = 'Y';
                 } else {

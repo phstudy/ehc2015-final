@@ -19,8 +19,8 @@ public class Record {
     public String weekOfDay;
     public char buy = DEFAULT_BUY;
     public short viewnum = 1;
-    public int price;
-    public short num;
+    public int price = 0;
+    public short num = 0;
 
     @Override
     public String toString() {
