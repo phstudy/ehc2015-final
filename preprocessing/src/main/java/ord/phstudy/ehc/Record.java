@@ -5,8 +5,6 @@ public class Record {
     public static final char DEFAULT_ETUREC = 'N';
     public static final char DEFAULT_BUY = 'N';
 
-
-
     public boolean isTrain = false;
     public String uid;
     public String eruid;
@@ -57,14 +55,18 @@ public class Record {
         return sb.toString();
     }
 
-    public String getHeader() {
+    public static String getHeader(boolean isTrain) {
         String comma = ",";
         StringBuilder sb = new StringBuilder(95);
         if (isTrain) {
             sb.append("weekOfDay").append(comma)
                     .append("hour").append(comma)
                     .append("eruid").append(comma)
-                    .append("cid").append(comma)
+                    .append("class1").append(comma)
+                    .append("class2").append(comma)
+                    .append("class3").append(comma)
+                    .append("class4").append(comma)
+                    .append("class5").append(comma)
                     .append("eturec").append(comma)
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)
@@ -78,7 +80,11 @@ public class Record {
             sb.append("weekOfDay").append(comma)
                     .append("hour").append(comma)
                     .append("eruid").append(comma)
-                    .append("cid").append(comma)
+                    .append("class1").append(comma)
+                    .append("class2").append(comma)
+                    .append("class3").append(comma)
+                    .append("class4").append(comma)
+                    .append("class5").append(comma)
                     .append("eturec").append(comma)
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)

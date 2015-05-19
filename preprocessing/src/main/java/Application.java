@@ -36,17 +36,7 @@ public class Application {
     }
 
     public static void main(String[] args) throws Exception {
-
-        int corePoolSize = 8;
-        int maximumPoolSize = 20;
-        long keepAliveTime = 60;
-        int capacity = 100;
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-                new LinkedBlockingDeque<Runnable>(capacity),
-                new ThreadPoolExecutor.CallerRunsPolicy());
-
-
+        
         final long startTime = System.currentTimeMillis();
         System.out.println("start: " + new Date());
 

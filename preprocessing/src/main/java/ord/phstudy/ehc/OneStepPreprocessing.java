@@ -26,8 +26,10 @@ public class OneStepPreprocessing {
     final static Map<String, Integer> prices = Maps.newConcurrentMap();
 
     final static Set<String> eruids = Sets.newHashSet();
+    static boolean writeHeader = true;
 
     public static void main(String[] args) throws Exception {
+
         int corePoolSize = 3;
         int maximumPoolSize = 3;
         long keepAliveTime = 60;
@@ -108,19 +110,22 @@ public class OneStepPreprocessing {
             int actIdx = line.indexOf("act=", MIN_ACTION_COLON_POS);
             int type = line.charAt(actIdx + 4);
 
-            if (type == 'v') { // view
+            if (type == 'v') { // view 86%
                 processView(line, isTrain);
-            } else if (type == 's') { // search
+            } else if (type == 's') { // search 6%
                 return;
-            } else if (type == 'c') { // cart
+            } else if (type == 'c') { // cart 7%
                 processCart(line, isTrain);
-            } else if (type == 'o') { // order
+            } else if (type == 'o') { // order 1%
                 processOrder(line, isTrain);
             }
         }
     }
 
     public static void writeTrainDataset(BufferedWriter bw) throws IOException {
+        if(writeHeader) {
+            bw.write(Record.getHeader(true) + "\n");
+        }
         Set<String> keys = records.keySet();
         Iterator<String> it = keys.iterator();
         while (it.hasNext()) {
@@ -130,12 +135,20 @@ public class OneStepPreprocessing {
             if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
                 record.cid = categories.get(pid);
             }
+            Integer p = prices.get(pid);
+            if (p != null) {
+                record.price = p;
+            }
+
             bw.write(record.toString() + "\n");
         }
         records.clear();
     }
 
     public static void writeTestDataset(BufferedWriter bw) throws IOException {
+        if(writeHeader) {
+            bw.write(Record.getHeader(false) + "\n");
+        }
         Set<String> keys = records.keySet();
         Iterator<String> it = keys.iterator();
         while (it.hasNext()) {
