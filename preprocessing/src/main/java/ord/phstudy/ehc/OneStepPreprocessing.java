@@ -34,7 +34,7 @@ public class OneStepPreprocessing {
         int capacity = 100;
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-                new LinkedBlockingDeque<>(capacity),
+                new LinkedBlockingDeque(capacity),
                 new ThreadPoolExecutor.CallerRunsPolicy());
 
         long startTime = System.currentTimeMillis();
