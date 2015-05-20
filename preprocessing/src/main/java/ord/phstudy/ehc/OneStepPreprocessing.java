@@ -25,7 +25,7 @@ public class OneStepPreprocessing {
     final static Map<String, Record> records = Maps.newConcurrentMap();
     final static Map<String, Integer> prices = Maps.newConcurrentMap();
 
-    final static Set<String> eruids = Sets.newHashSet();
+    //final static Set<String> eruids = Sets.newConcurrentHashSet();
     static boolean writeHeader = true;
 
     public static void main(String[] args) throws Exception {
@@ -59,6 +59,7 @@ public class OneStepPreprocessing {
 
         long endTime = System.currentTimeMillis();
         System.out.println("Training dataset generation took " + (endTime - startTime) + " ms");
+        //System.out.println(eruids.size()); //807088
 
 
         // Test Dataset
@@ -77,6 +78,7 @@ public class OneStepPreprocessing {
         System.out.println("Testing dataset generation took " + (endTime - startTime) + " ms");
 
 
+        //System.out.println(eruids.size()); //1589976
         // no op -> 6 secs
         // 1 thread no op -> 8 secs
         // 2 thread no op -> 10 secs
@@ -123,7 +125,7 @@ public class OneStepPreprocessing {
     }
 
     public static void writeTrainDataset(BufferedWriter bw) throws IOException {
-        if(writeHeader) {
+        if (writeHeader) {
             bw.write(Record.getHeader(true) + "\n");
         }
         Set<String> keys = records.keySet();
@@ -146,7 +148,7 @@ public class OneStepPreprocessing {
     }
 
     public static void writeTestDataset(BufferedWriter bw) throws IOException {
-        if(writeHeader) {
+        if (writeHeader) {
             bw.write(Record.getHeader(false) + "\n");
         }
         Set<String> keys = records.keySet();
@@ -173,6 +175,7 @@ public class OneStepPreprocessing {
             return;
         }
         String eruid = ExtractorUtils.extractEruid(line);
+        //eruids.add(eruid);
         String key = pid + eruid;
 
         Record record;
@@ -206,6 +209,8 @@ public class OneStepPreprocessing {
 
     public static void processCart(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
+        //eruids.add(eruid);
+
         String plist = ExtractorUtils.extractPlist(line);
         String[] products = plist.split(",");
 
@@ -248,6 +253,8 @@ public class OneStepPreprocessing {
 
     public static void processOrder(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
+        //eruids.add(eruid);
+
         String plist = ExtractorUtils.extractPlist(line);
         String[] products = plist.split(",");
 
