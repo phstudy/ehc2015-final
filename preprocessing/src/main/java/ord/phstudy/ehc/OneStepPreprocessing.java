@@ -23,7 +23,6 @@ public class OneStepPreprocessing {
     // 290138
     final static Map<String, String> categories = Maps.newConcurrentMap();
     final static Map<String, Record> records = Maps.newConcurrentMap();
-    final static Map<String, Integer> prices = Maps.newConcurrentMap();
 
     final static Set<String> eruids = Sets.newHashSet();
     static boolean writeHeader = true;
@@ -135,7 +134,7 @@ public class OneStepPreprocessing {
             if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
                 record.cid = categories.get(pid);
             }
-            Integer p = prices.get(pid);
+            Integer p = PriceUtils.prices.get(pid);
             if (p != null) {
                 record.price = p;
             }
@@ -158,7 +157,7 @@ public class OneStepPreprocessing {
             if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
                 record.cid = categories.get(pid);
             }
-            Integer p = prices.get(pid);
+            Integer p = PriceUtils.prices.get(pid);
             if (p != null) {
                 record.price = p;
             }
@@ -219,8 +218,8 @@ public class OneStepPreprocessing {
                 short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
 
-                if (!prices.containsKey(pid)) {
-                    prices.put(pid, price);
+                if (!PriceUtils.prices.containsKey(pid)) {
+                    PriceUtils.prices.put(pid, price);
                 }
 
                 Record record;
@@ -258,8 +257,8 @@ public class OneStepPreprocessing {
                 short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
 
-                if (!prices.containsKey(pid)) {
-                    prices.put(pid, price);
+                if (!PriceUtils.prices.containsKey(pid)) {
+                    PriceUtils.prices.put(pid, price);
                 }
 
                 Record record;

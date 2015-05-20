@@ -37,6 +37,12 @@ public class FileManager {
         return new File(baseDir, name);
     }
 
+
+    public static BufferedReader fileAsReader(File file) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        managedResources.add(reader);
+        return reader;
+    }
     public static BufferedReader fileAsReader(String name) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file(name)));
         managedResources.add(reader);
