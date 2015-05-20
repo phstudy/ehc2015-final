@@ -7,8 +7,6 @@ import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,18 +15,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by study on 5/20/15.
  */
-public class FetchPrice {
+public class FetchPrice2 {
 
     static BufferedReader categoryOnlyBr;
-    static BufferedWriter categoryBw;
+    static BufferedWriter categoryBw, categoryBw2, categoryBw3;
     static AtomicInteger cnt = new AtomicInteger(0);
-    static String bashUrl = "http://iguang.tw/udn/product/";
-    //static String bashUrl = "http://shopping.udn.com/mall/cus/cat/Cc1c02.do?dc_cargxuid_0=";
-    static int bashUrlLength = bashUrl.length();
-    static Set<String> cids = new HashSet<String>();
+    static String bashUrl = "http://www.cheapcheap.com.tw/kw?q=";
 
     public static void main(String[] args) throws Exception {
-        int corePoolSize = 8;
+        int corePoolSize = 3;
         int maximumPoolSize = 20;
         long keepAliveTime = 60;
         int capacity = 100;
@@ -39,8 +34,11 @@ public class FetchPrice {
 
         //String categoryStr = "A_001_001_003_001";
 
-        categoryOnlyBr = FileManager.fileAsReader("missing_products.csv");
-        categoryBw = FileManager.fileAsWriter("products_full.csv");
+        categoryOnlyBr = FileManager.fileAsReader("products_full.csv");
+        categoryBw = FileManager.fileAsWriter("products2_full.csv");
+        categoryBw2 = FileManager.fileAsWriter("products2_price_nonzero.csv");
+        categoryBw3 = FileManager.fileAsWriter("products2_price_zero.csv");
+
 
         String line;
         while ((line = categoryOnlyBr.readLine()) != null) {
@@ -65,31 +63,39 @@ public class FetchPrice {
         @Override
         public void run() {
             try {
-                String upid = "U" + line.substring(0, line.length() - 1);
-                String url = bashUrl + upid + ".html";
+                String[] parts = line.split(",");
+                String pid = parts[0];
+                String upid = parts[1];
+                String price = parts[2];
+                String title = parts[3];
+
+                if (!"0".equals(price)) { // skip
+                    return;
+                }
+
+                String url = bashUrl + title;
 
                 Document doc = Jsoup.connect(url).get();
-                Elements anchors = doc.select("a[class=sublink]");
-                Elements spans = doc.select("span[property=price]");
 
-
-                String title = "";
-                String price = "0";
+                Elements anchors = doc.select("div[class=product-price]");
 
                 if (anchors.size() > 0) {
-                    title = anchors.get(0).text().replace(",", "，");
+                    Elements spans = anchors.select("span");
+                    if (spans.size() > 0) {
+                        price = spans.get(0).text();
+                    }
                 }
-                if (spans.size() > 0) {
-                    price = spans.get(0).text();
-                }
-                categoryBw.write(line + "," + upid + "," + title + "," + price + "\n");
+                categoryBw.write(pid + "," + upid + "," + title + "," + price + "\n");
 
+                if ("0".equals(price)) {
+                    categoryBw3.write(pid + "," + price + "\n");
+                } else {
+                    categoryBw2.write(pid + "," + price + "\n");
+                }
             } catch (Exception e) {
                 //e.printStackTrace();
             }
 
         }
     }
-    // pdtname
-    // itemprop="value"
 }
