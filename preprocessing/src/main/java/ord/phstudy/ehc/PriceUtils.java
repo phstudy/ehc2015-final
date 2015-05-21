@@ -41,6 +41,18 @@ public class PriceUtils {
                 prices.put(uid, price);
             }
             System.out.println("product prices#2 init.");
+
+            // http://pk.emailcash.com.tw/catalog.asp
+            file = new File(classLoader.getResource("product3.csv").getFile());
+            trainBr = FileManager.fileAsReader(file);
+
+            while ((line = trainBr.readLine()) != null) {
+                String[] part = line.split(",");
+                String uid = part[0];
+                int price = Integer.parseInt(part[1]);
+                prices.put(uid, price);
+            }
+            System.out.println("product prices#3 init.");
         } catch (Exception e) {
             e.printStackTrace();
         }
