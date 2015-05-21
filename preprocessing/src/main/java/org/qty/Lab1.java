@@ -8,13 +8,20 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import ord.phstudy.ehc.ExtractorUtils;
-
 import com.google.common.base.Stopwatch;
 
 import file.FileManager;
 
 public class Lab1 {
+
+    static String eruid(String line) {
+        int p = line.indexOf(";erUid=");
+        if (p == -1) {
+            return "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+        }
+        int q = line.indexOf(";", p + ";erUid=".length());
+        return line.substring(p + ";erUid=".length(), q);
+    }
 
     public static void main(String[] args) throws Exception {
 
@@ -27,7 +34,10 @@ public class Lab1 {
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         for (String s : FileManager.fileAsLineIterator("EHC_2nd_round_test.log")) {
-            String eruid = ExtractorUtils.extractEruid(s);
+            String eruid = eruid(s);
+            if (eruid.contains(" ")) {
+                continue;
+            }
             if (s.contains("act=v")) {
                 viewCount++;
                 totalCount++;
@@ -57,9 +67,10 @@ public class Lab1 {
         StringBuilder sb = new StringBuilder();
         for (String s : eruids) {
             sb.setLength(0);
-            sb.append(s).append(",");
+//            sb.append(s).append(",");
             sb.append(viewCounter.ratio(s, viewCount)).append(",");
-            sb.append(searchCounter.ratio(s, searchCount)).append("\n");
+            sb.append(searchCounter.ratio(s, searchCount)).append(",");
+            sb.append(viewCounter.ratio(s, totalCount / 1000D)).append("\n");
             w.write(sb.toString());
         }
         System.out.println("elapsed at writing " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds.");
@@ -82,11 +93,12 @@ public class Lab1 {
             counter.put(s, new AtomicInteger(1));
         }
 
-        public double ratio(String s, double base) {
+        public String ratio(String s, double base) {
             if (counter.containsKey(s)) {
-                return counter.get(s).doubleValue() / base;
+                double v = counter.get(s).doubleValue() / base;
+                return String.format("%.10f", v);
             }
-            return 0D;
+            return "0";
         }
 
         @Override
