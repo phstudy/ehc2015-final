@@ -11,7 +11,7 @@ compileJava {
     targetCompatibility = 1.6
 }
 
-mainClassName = "Launcher"
+mainClassName = "org.qty.Lab2"
 
 
 repositories {
@@ -30,4 +30,11 @@ dependencies {
     compile 'eu.bitwalker:UserAgentUtils:1.15'
     compile 'com.google.guava:guava:18.0'
     compile 'net.jpountz.lz4:lz4:1.3.0'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'commons-io:commons-io:2.4'
+
+}
+
+task copyDependencies(type:Copy) {
+    from configurations.compile into 'build/dependencies'
 }
