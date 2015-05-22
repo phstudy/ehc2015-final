@@ -28,14 +28,7 @@ public class OneStepPreprocessing {
 
     public static void main(String[] args) throws Exception {
 
-        int corePoolSize = 3;
-        int maximumPoolSize = 3;
-        long keepAliveTime = 60;
-        int capacity = 100;
 
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-                new LinkedBlockingDeque<Runnable>(capacity),
-                new ThreadPoolExecutor.CallerRunsPolicy());
 
         long startTime = System.currentTimeMillis();
 
@@ -47,29 +40,21 @@ public class OneStepPreprocessing {
         // Train Dataset
         String line;
         while ((line = trainBr.readLine()) != null) {
-            pool.execute(new Task(line, true));
+            new Task(line, true).run();
         }
-        while (pool.getTaskCount() != pool.getCompletedTaskCount()) {
-            System.err.println("count=" + pool.getTaskCount() + "," + pool.getCompletedTaskCount());
-            Thread.sleep(1000);
-        }
+
         writeTrainDataset(trainBw);
 
         long endTime = System.currentTimeMillis();
         System.out.println("Training dataset generation took " + (endTime - startTime) + " ms");
 
-
         // Test Dataset
         startTime = System.currentTimeMillis();
         while ((line = testBr.readLine()) != null) {
-            pool.execute(new Task(line, false));
+            new Task(line, false).run();
         }
-        while (pool.getTaskCount() != pool.getCompletedTaskCount()) {
-            System.err.println("count=" + pool.getTaskCount() + "," + pool.getCompletedTaskCount());
-            Thread.sleep(1000);
-        }
+
         writeTestDataset(testBw);
-        pool.shutdown();
 
         endTime = System.currentTimeMillis();
         System.out.println("Testing dataset generation took " + (endTime - startTime) + " ms");
