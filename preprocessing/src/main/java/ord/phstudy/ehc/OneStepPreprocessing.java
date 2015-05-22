@@ -24,7 +24,6 @@ public class OneStepPreprocessing {
     final static Map<String, String> categories = Maps.newConcurrentMap();
     final static Map<String, Record> records = Maps.newConcurrentMap();
 
-    final static Set<String> eruids = Sets.newHashSet();
     static boolean writeHeader = true;
 
     public static void main(String[] args) throws Exception {
@@ -188,7 +187,7 @@ public class OneStepPreprocessing {
             record.pid = pid;
             record.uid = ExtractorUtils.extractUid(line);
             //record.ip = ExtractorUtils.extractIp(line);
-            //record.ua = extractUserAgent(line);
+            record.device = ExtractorUtils.extractDevice(line);
             record.eturec = ExtractorUtils.extractEturec(line);
             record.eruid = eruid;
             record.hour = ExtractorUtils.extractHour(line);
@@ -235,7 +234,7 @@ public class OneStepPreprocessing {
                     record.price = price;
                     record.uid = ExtractorUtils.extractUid(line);
                     //record.ip = ExtractorUtils.extractIp(line);
-                    //record.ua = extractUserAgent(line);
+                    record.device = ExtractorUtils.extractDevice(line);
                     record.eruid = eruid;
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
@@ -275,7 +274,7 @@ public class OneStepPreprocessing {
                     record.price = price;
                     record.uid = ExtractorUtils.extractUid(line);
                     //record.ip = ExtractorUtils.extractIp(line);
-                    //record.ua = extractUserAgent(line);
+                    record.device = ExtractorUtils.extractDevice(line);
                     record.buy = 'Y';
                     record.eruid = eruid;
                     record.hour = ExtractorUtils.extractHour(line);

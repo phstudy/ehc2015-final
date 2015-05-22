@@ -12,7 +12,12 @@ public class Record {
     public String pid;
     public short hour;
     public String ip;
-    public String ua;
+    public char device;
+    // A:iPhone
+    // B:iPad
+    // C:Android
+    // D:Other
+
     public char eturec = DEFAULT_ETUREC;
     public String weekOfDay;
     public char buy = DEFAULT_BUY;
@@ -33,8 +38,9 @@ public class Record {
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
-                    //.append(ua).append(comma)
+                    .append(device).append(comma)
                     .append(uid).append(comma)
+                    .append("".equals(uid) ? 'N' : 'Y').append(comma) // isLogin
                     .append(price).append(comma)
                     .append(buy).append(comma)
                     .append(num);
@@ -47,8 +53,9 @@ public class Record {
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
-                    //.append(ua).append(comma)
+                    .append(device).append(comma)
                     .append(uid).append(comma)
+                    .append("".equals(uid) ? 'N' : 'Y').append(comma)
                     .append(price);
         }
 
@@ -71,8 +78,9 @@ public class Record {
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
-                    //.append("ua").append(comma)
+                    .append("device").append(comma)
                     .append("uid").append(comma)
+                    .append("login").append(comma)
                     .append("price").append(comma)
                     .append("buy").append(comma)
                     .append("num");
@@ -89,8 +97,9 @@ public class Record {
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
-                    //.append("ua").append(comma)
+                    .append("device").append(comma)
                     .append("uid").append(comma)
+                    .append("login").append(comma)
                     .append("price");
         }
 

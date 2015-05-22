@@ -14,6 +14,13 @@ public class ExtractorUtils {
     final static int MIN_UID_POS = 56;
     final static int MIN_PLIST_POS = 71;
     final static int MIN_ETUREC_POS = 100;
+    final static String DEVICIES_STR[] = {"iPhone", "iPad", "Android"};
+    final static char DEVICIES[] = {'A', 'B', 'C', 'D'};
+
+    // A:iPhone
+    // B:iPad
+    // C:Android
+    // D:Other
 
     public static String extractCategory(String line) {
 //        int catIdx = line.indexOf("cat=", MIN_CATEGORY_POS);
@@ -119,9 +126,19 @@ public class ExtractorUtils {
         return line.substring(0, ipIdx);
     }
 
-    public static String extractUserAgent(String line) {
+    public static char extractDevice(String line) {
         int uaIdx = line.indexOf("\" \"", MIN_USER_AGENT_SPACE_POS);
-        return line.substring(uaIdx + 3);
+        String ua = line.substring(uaIdx + 3);
+
+        char device = 'D'; // other
+        for(int i =0; i < DEVICIES_STR.length; i++) {
+            if(ua.contains(DEVICIES_STR[i])) {
+                device = DEVICIES[i];
+                break;
+            }
+        }
+
+        return device;
     }
 
     public static String extractPid(String line) {
