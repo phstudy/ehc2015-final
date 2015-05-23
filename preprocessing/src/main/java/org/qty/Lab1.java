@@ -1,12 +1,8 @@
 package org.qty;
 
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Stopwatch;
 
@@ -29,8 +25,8 @@ public class Lab1 {
         long searchCount = 0;
         long totalCount = 0;
 
-        Counter viewCounter = new Counter();
-        Counter searchCounter = new Counter();
+        ItemCounter<String> viewCounter = new ItemCounter<String>();
+        ItemCounter<String> searchCounter = new ItemCounter<String>();
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         for (String s : FileManager.fileAsLineIterator("EHC_2nd_round_test.log")) {
@@ -67,7 +63,7 @@ public class Lab1 {
         StringBuilder sb = new StringBuilder();
         for (String s : eruids) {
             sb.setLength(0);
-//            sb.append(s).append(",");
+            //            sb.append(s).append(",");
             sb.append(viewCounter.ratio(s, viewCount)).append(",");
             sb.append(searchCounter.ratio(s, searchCount)).append(",");
             sb.append(viewCounter.ratio(s, totalCount / 1000D)).append("\n");
@@ -77,33 +73,4 @@ public class Lab1 {
 
     }
 
-    static class Counter {
-
-        Map<String, AtomicInteger> counter = new HashMap<String, AtomicInteger>();
-
-        public Set<String> key() {
-            return counter.keySet();
-        }
-
-        public void count(String s) {
-            if (counter.containsKey(s)) {
-                counter.get(s).incrementAndGet();
-                return;
-            }
-            counter.put(s, new AtomicInteger(1));
-        }
-
-        public String ratio(String s, double base) {
-            if (counter.containsKey(s)) {
-                double v = counter.get(s).doubleValue() / base;
-                return String.format("%.10f", v);
-            }
-            return "0";
-        }
-
-        @Override
-        public String toString() {
-            return "" + counter;
-        }
-    }
 }

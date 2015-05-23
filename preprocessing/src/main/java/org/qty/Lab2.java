@@ -26,6 +26,7 @@ import file.FileManager;
 
 public class Lab2 {
 
+    private static final String inputFile = "EHC_2nd_round_train.log";
     private static final String NO_PID = "000000";
 
     static String eruid(String line) {
@@ -71,10 +72,10 @@ public class Lab2 {
 
         System.out.println(String.format("pruneLessThanThreshold: %s, pruneGreaterThanThreshold: %s, keepLastN: %s",
                 pruneLessThanThreshold, pruneGreaterThanThreshold, keepLastN));
-        Counter viewCounter = new Counter();
+        ItemCounter<String> viewCounter = new ItemCounter<String>();
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        for (String s : FileManager.fileAsLineIterator(inputFile())) {
+        for (String s : FileManager.fileAsLineIterator(inputFile)) {
             String eruid = eruid(s);
             if (eruid.contains(" ")) {
                 continue;
@@ -90,9 +91,9 @@ public class Lab2 {
         viewCounter.filterOutCountLessThan(pruneLessThanThreshold);
         System.out.println("elapsed [1] => " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds.");
 
-        Counter pidCounter = new Counter();
+        ItemCounter<String> pidCounter = new ItemCounter<String>();
         ClickHistory clickHistory = new ClickHistory(keepLastN);
-        for (String s : FileManager.fileAsLineIterator(inputFile())) {
+        for (String s : FileManager.fileAsLineIterator(inputFile)) {
             String eruid = eruid(s);
             if (eruid.contains(" ")) {
                 continue;
@@ -112,66 +113,6 @@ public class Lab2 {
         clickHistory.write();
         System.out.println("elapsed [3] => " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds.");
 
-    }
-
-    protected static String inputFile() {
-        return "EHC_2nd_round_train.log";
-    }
-
-    static class Counter {
-
-        Map<String, AtomicInteger> counter = new HashMap<String, AtomicInteger>();
-
-        public Set<String> key() {
-            return counter.keySet();
-        }
-
-        public void filterOutCountLessThan(int threshold) {
-            Iterator<Entry<String, AtomicInteger>> it = counter.entrySet().iterator();
-            while (it.hasNext()) {
-                if (it.next().getValue().intValue() < threshold) {
-                    it.remove();
-                }
-            }
-        }
-
-        public boolean containsKey(String eruid) {
-            return counter.containsKey(eruid);
-        }
-
-        public void filterOutCountGreaterThan(int threshold) {
-            Iterator<Entry<String, AtomicInteger>> it = counter.entrySet().iterator();
-            while (it.hasNext()) {
-                if (it.next().getValue().intValue() > threshold) {
-                    it.remove();
-                }
-            }
-        }
-
-        public int size() {
-            return counter.size();
-        }
-
-        public void count(String s) {
-            if (counter.containsKey(s)) {
-                counter.get(s).incrementAndGet();
-                return;
-            }
-            counter.put(s, new AtomicInteger(1));
-        }
-
-        public String ratio(String s, double base) {
-            if (counter.containsKey(s)) {
-                double v = counter.get(s).doubleValue() / base;
-                return String.format("%.10f", v);
-            }
-            return "0";
-        }
-
-        @Override
-        public String toString() {
-            return "" + counter;
-        }
     }
 
     static class ClickHistory {
@@ -199,7 +140,7 @@ public class Lab2 {
         }
 
         public void write() throws IOException {
-            Counter counter = new Counter();
+            ItemCounter<String> counter = new ItemCounter<String>();
             Iterator<Entry<String, Queue<String>>> it = store.entrySet().iterator();
             while (it.hasNext()) {
                 Entry<String, Queue<String>> e = it.next();
