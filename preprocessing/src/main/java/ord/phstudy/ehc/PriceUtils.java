@@ -1,11 +1,13 @@
 package ord.phstudy.ehc;
 
-import com.google.common.collect.Maps;
-import file.FileManager;
-
-import java.io.BufferedReader;
-import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * Created by study on 5/20/15.
@@ -14,47 +16,27 @@ public class PriceUtils {
     public static Map<String, Integer> prices = Maps.newConcurrentMap();
 
     static {
+        loadPriceFromData("/product.csv");
+        loadPriceFromData("/product2.csv");
+        loadPriceFromData("/product3.csv");
+    }
+
+    public static void loadPriceFromData(String classpathLocation) {
+        InputStream in = PriceUtils.class.getResourceAsStream(classpathLocation);
         try {
-            ClassLoader classLoader = PriceUtils.class.getClassLoader();
-
-            // http://iguang.tw/udn/product/<pid>.html
-            File file = new File(classLoader.getResource("product.csv").getFile());
-            BufferedReader trainBr = FileManager.fileAsReader(file);
-            String line;
-
-            while ((line = trainBr.readLine()) != null) {
-                String[] part = line.split(",");
+            Iterator<String> it = IOUtils.lineIterator(in, Charset.defaultCharset());
+            while (it.hasNext()) {
+                String[] part = it.next().split(",");
                 String uid = part[0];
                 int price = Integer.parseInt(part[1]);
                 prices.put(uid, price);
             }
-            System.out.println("product prices#1 init.");
-
-            // http://www.cheapcheap.com.tw/kw?q=<desc>
-            file = new File(classLoader.getResource("product2.csv").getFile());
-            trainBr = FileManager.fileAsReader(file);
-
-            while ((line = trainBr.readLine()) != null) {
-                String[] part = line.split(",");
-                String uid = part[0];
-                int price = Integer.parseInt(part[1]);
-                prices.put(uid, price);
-            }
-            System.out.println("product prices#2 init.");
-
-            // http://pk.emailcash.com.tw/catalog.asp
-            file = new File(classLoader.getResource("product3.csv").getFile());
-            trainBr = FileManager.fileAsReader(file);
-
-            while ((line = trainBr.readLine()) != null) {
-                String[] part = line.split(",");
-                String uid = part[0];
-                int price = Integer.parseInt(part[1]);
-                prices.put(uid, price);
-            }
-            System.out.println("product prices#3 init.");
+            System.out.println("load product prices: " + classpathLocation);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(in);
         }
+
     }
 }
