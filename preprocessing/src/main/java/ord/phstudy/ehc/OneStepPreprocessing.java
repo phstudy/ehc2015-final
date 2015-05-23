@@ -1,7 +1,6 @@
 package ord.phstudy.ehc;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import file.FileManager;
 
 import java.io.BufferedReader;
@@ -10,9 +9,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by study on 5/18/15.
@@ -27,7 +23,6 @@ public class OneStepPreprocessing {
     static boolean writeHeader = true;
 
     public static void main(String[] args) throws Exception {
-
 
 
         long startTime = System.currentTimeMillis();
@@ -106,7 +101,7 @@ public class OneStepPreprocessing {
     }
 
     public static void writeTrainDataset(BufferedWriter bw) throws IOException {
-        if(writeHeader) {
+        if (writeHeader) {
             bw.write(Record.getHeader(true) + "\n");
         }
         Set<String> keys = records.keySet();
@@ -118,9 +113,12 @@ public class OneStepPreprocessing {
             if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
                 record.cid = categories.get(pid);
             }
-            Integer p = PriceUtils.prices.get(pid);
-            if (p != null) {
-                record.price = p;
+
+            if (record.price == 0) {
+                Integer p = PriceUtils.prices.get(pid);
+                if (p != null) {
+                    record.price = p;
+                }
             }
 
             bw.write(record.toString() + "\n");
@@ -129,7 +127,7 @@ public class OneStepPreprocessing {
     }
 
     public static void writeTestDataset(BufferedWriter bw) throws IOException {
-        if(writeHeader) {
+        if (writeHeader) {
             bw.write(Record.getHeader(false) + "\n");
         }
         Set<String> keys = records.keySet();
@@ -141,9 +139,11 @@ public class OneStepPreprocessing {
             if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
                 record.cid = categories.get(pid);
             }
-            Integer p = PriceUtils.prices.get(pid);
-            if (p != null) {
-                record.price = p;
+            if (record.price == 0) {
+                Integer p = PriceUtils.prices.get(pid);
+                if (p != null) {
+                    record.price = p;
+                }
             }
 
             bw.write(record.toString() + "\n");
@@ -199,23 +199,18 @@ public class OneStepPreprocessing {
             for (int i = 0; i < len; i += 3) {
                 String pid = products[i];
                 String key = pid + eruid;
-                short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
 
-                if (!PriceUtils.prices.containsKey(pid)) {
-                    PriceUtils.prices.put(pid, price);
-                }
+                PriceUtils.prices.put(pid, price); // update price
 
                 Record record;
                 if (records.containsKey(key)) {
                     record = records.get(key);
-                    record.num = num;
                     record.price = price;
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
                     record.pid = pid;
-                    record.num = num;
                     record.price = price;
                     record.uid = ExtractorUtils.extractUid(line);
                     //record.ip = ExtractorUtils.extractIp(line);
@@ -223,6 +218,8 @@ public class OneStepPreprocessing {
                     record.eruid = eruid;
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
+
+                    records.put(key, record);
                 }
             }
         }
@@ -234,6 +231,7 @@ public class OneStepPreprocessing {
         String plist = ExtractorUtils.extractPlist(line);
         String[] products = plist.split(",");
 
+
         if (products.length > 1) { // has Product ?
             for (int i = 0; i < products.length; i += 3) {
                 String pid = products[i];
@@ -241,9 +239,7 @@ public class OneStepPreprocessing {
                 short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
 
-                if (!PriceUtils.prices.containsKey(pid)) {
-                    PriceUtils.prices.put(pid, price);
-                }
+                PriceUtils.prices.put(pid, price); // update price
 
                 Record record;
                 if (records.containsKey(key)) {
@@ -257,13 +253,15 @@ public class OneStepPreprocessing {
                     record.pid = pid;
                     record.num = num;
                     record.price = price;
-                    record.uid = ExtractorUtils.extractUid(line);
+                    //record.uid = ExtractorUtils.extractUid(line); // skip uid
                     //record.ip = ExtractorUtils.extractIp(line);
                     record.device = ExtractorUtils.extractDevice(line);
                     record.buy = 'Y';
                     record.eruid = eruid;
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
+
+                    records.put(key, record);
                 }
             }
         }
