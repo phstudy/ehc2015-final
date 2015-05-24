@@ -61,4 +61,12 @@ public class ItemCounter<Key> {
     public String toString() {
         return "" + counter;
     }
+
+    public int getValue(Key key) {
+        return counter.get(key).intValue();
+    }
+
+    public void setValue(Key key, int newValue) {
+        counter.get(key).set(newValue);
+    }
 }

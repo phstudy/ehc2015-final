@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ord.phstudy.ehc.PriceUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -24,7 +26,7 @@ import com.google.common.collect.Sets.SetView;
 
 import file.FileManager;
 
-public class Lab2 {
+public class ClickHistory2_Price {
 
     private static final String inputFile = "EHC_2nd_round_train.log";
     private static final String NO_PID = "000000";
@@ -151,8 +153,20 @@ public class Lab2 {
                 }
             }
 
+            for (String key : counter.counter.keySet()) {
+                int value = counter.getValue(key);
+                if (PriceUtils.prices.containsKey(key)) {
+                    int newValue = value * PriceUtils.prices.get(key);
+                    if (newValue == 0) {
+                        System.err.println("oops");
+                    }
+                    //                    counter.setValue(key, newValue);
+                }
+            }
+
             ArrayList<Entry<String, AtomicInteger>> list = new ArrayList<Map.Entry<String, AtomicInteger>>(
                     counter.counter.entrySet());
+
             Collections.sort(list, new Comparator<Entry<String, AtomicInteger>>() {
 
                 @Override
@@ -162,12 +176,9 @@ public class Lab2 {
             });
 
             show(list, 20);
-            show(list, 40);
-            show(list, 60);
-            show(list, 80);
-            show(list, 100);
-            show(list, 1000);
-            show(list, 3000);
+            show(list, 200);
+            show(list, 2000);
+            show(list, 20000);
         }
 
         protected void show(ArrayList<Entry<String, AtomicInteger>> list, int topN) throws IOException {
