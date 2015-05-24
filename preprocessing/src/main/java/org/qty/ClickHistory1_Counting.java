@@ -1,5 +1,8 @@
 package org.qty;
 
+import static org.qty.QLabInitConfig.NO_PID;
+import static org.qty.QLabInitConfig.INPUT_FILE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +28,6 @@ import com.google.common.collect.Sets.SetView;
 import file.FileManager;
 
 public class ClickHistory1_Counting {
-
-    private static final String inputFile = "EHC_2nd_round_train.log";
-    private static final String NO_PID = "000000";
 
     static String eruid(String line) {
         String s = StringUtils.substringBetween(line, "erUid=", ";");
@@ -75,7 +75,7 @@ public class ClickHistory1_Counting {
         ItemCounter<String> viewCounter = new ItemCounter<String>();
 
         Stopwatch stopwatch = Stopwatch.createStarted();
-        for (String s : FileManager.fileAsLineIterator(inputFile)) {
+        for (String s : FileManager.fileAsLineIterator(INPUT_FILE)) {
             String eruid = eruid(s);
             if (eruid.contains(" ")) {
                 continue;
@@ -93,7 +93,7 @@ public class ClickHistory1_Counting {
 
         ItemCounter<String> pidCounter = new ItemCounter<String>();
         ClickHistory clickHistory = new ClickHistory(keepLastN);
-        for (String s : FileManager.fileAsLineIterator(inputFile)) {
+        for (String s : FileManager.fileAsLineIterator(INPUT_FILE)) {
             String eruid = eruid(s);
             if (eruid.contains(" ")) {
                 continue;
