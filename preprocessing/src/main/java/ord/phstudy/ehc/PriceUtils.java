@@ -17,8 +17,6 @@ public class PriceUtils {
 
     static {
         loadPriceFromData("/product.csv");
-        loadPriceFromData("/product2.csv");
-        loadPriceFromData("/product3.csv");
     }
 
     public static void loadPriceFromData(String classpathLocation) {
