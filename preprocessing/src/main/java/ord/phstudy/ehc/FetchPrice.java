@@ -39,7 +39,7 @@ public class FetchPrice {
 
         //String categoryStr = "A_001_001_003_001";
 
-        categoryOnlyBr = FileManager.fileAsReader("missing_products.csv");
+        categoryOnlyBr = FileManager.fileAsReader("products1_full.csv");
         categoryBw = FileManager.fileAsWriter("products_full.csv");
 
         String line;
@@ -52,7 +52,10 @@ public class FetchPrice {
 
         categoryBw.flush();
         categoryBw.close();
+
+        pool.awaitTermination(30, TimeUnit.SECONDS);
         pool.shutdown();
+        pool.awaitTermination(30, TimeUnit.SECONDS);
     }
 
     public static class Task implements Runnable {
@@ -64,28 +67,48 @@ public class FetchPrice {
 
         @Override
         public void run() {
+            String upid;
+            String pid;
+            String title = "";
+            String price = "0";
+
+            String str[] = line.split(",");
+            if (str.length > 3) {
+                pid = str[0];
+                price = str[1];
+                upid = str[2];
+                title = str[3];
+            } else {
+                pid = str[0];
+                price = str[1];
+                upid = str[2];
+            }
+
             try {
-                String upid = "U" + line.substring(0, line.length() - 1);
-                String url = bashUrl + upid + ".html";
+                if (!"".equals(title)) {
+                    categoryBw.write(pid + "," + price + "," + upid + "," + title + "\n");
+                } else {
+                    String url = bashUrl + upid + ".html";
 
-                Document doc = Jsoup.connect(url).get();
-                Elements anchors = doc.select("a[class=sublink]");
-                Elements spans = doc.select("span[property=price]");
+                    Document doc = Jsoup.connect(url).timeout(60000).get();
+                    Elements anchors = doc.select("a[class=sublink]");
+                    Elements spans = doc.select("span[property=price]");
 
-
-                String title = "";
-                String price = "0";
-
-                if (anchors.size() > 0) {
-                    title = anchors.get(0).text().replace(",", "，");
+                    if (anchors.size() > 0) {
+                        title = anchors.get(0).text().replace(",", "，");
+                    }
+                    if (spans.size() > 0) {
+                        price = spans.get(0).text();
+                    }
+                    categoryBw.write(pid + "," + price + "," + upid + "," + title + "\n");
                 }
-                if (spans.size() > 0) {
-                    price = spans.get(0).text();
-                }
-                categoryBw.write(line + "," + upid + "," + title + "," + price + "\n");
-
             } catch (Exception e) {
-                //e.printStackTrace();
+                try {
+                    categoryBw.write(pid + "," + price + "," + upid + "," + title + "\n");
+                    System.out.println(pid + "," + price + "," + upid + "," + title + "\n");
+                } catch (Exception e1) {
+                }
+                e.printStackTrace();
             }
 
         }
