@@ -25,7 +25,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
-import file.FileManager;
+import org.qty.file.FileManager;
 
 public class ClickHistory1_Counting {
 

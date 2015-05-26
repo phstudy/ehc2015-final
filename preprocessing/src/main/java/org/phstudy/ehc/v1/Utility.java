@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -5,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import domain.ProductRecord;
+import org.phstudy.ehc.v1.domain.ProductRecord;
 
 public class Utility {
 

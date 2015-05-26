@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,10 +8,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import callback.CSVProcessor;
+import org.qty.callback.CSVProcessor;
 
 import com.google.common.base.Joiner;
-import file.FileManager;
+import org.qty.file.FileManager;
 
 public class JoinViewOrder {
     public static void main(String[] args) throws Exception {

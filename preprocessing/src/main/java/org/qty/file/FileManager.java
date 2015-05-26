@@ -1,4 +1,4 @@
-package file;
+package org.qty.file;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

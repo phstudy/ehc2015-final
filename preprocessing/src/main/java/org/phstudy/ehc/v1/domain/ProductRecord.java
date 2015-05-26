@@ -1,4 +1,4 @@
-package domain;
+package org.phstudy.ehc.v1.domain;
 
 /**
  * Created by study on 5/16/15.

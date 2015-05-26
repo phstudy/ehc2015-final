@@ -1,4 +1,4 @@
-package ord.phstudy.ehc;
+package org.phstudy.ehc.utils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

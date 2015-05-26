@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,15 +15,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import domain.ProductRecord;
-import domain.Record;
-import file.FileManager;
+import org.phstudy.ehc.v1.domain.ProductRecord;
+import org.phstudy.ehc.v1.domain.Record;
+import org.qty.file.FileManager;
 
 /**
  * Created by study on 5/14/15.

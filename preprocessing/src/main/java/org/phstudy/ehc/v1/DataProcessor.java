@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
@@ -8,9 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import callback.CSVProcessor;
-import callback.LogProcessor;
-import domain.Record;
+import org.qty.callback.CSVProcessor;
+import org.qty.callback.LogProcessor;
+import org.phstudy.ehc.v1.domain.Record;
 
 public class DataProcessor {
 

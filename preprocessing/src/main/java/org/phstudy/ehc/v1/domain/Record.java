@@ -1,4 +1,4 @@
-package domain;
+package org.phstudy.ehc.v1.domain;
 
 import eu.bitwalker.useragentutils.UserAgent;
 

@@ -1,3 +1,5 @@
+package org.phstudy.ehc.v1;
+
 public class Launcher {
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && "JOINVIEW".equals(args[0])) {

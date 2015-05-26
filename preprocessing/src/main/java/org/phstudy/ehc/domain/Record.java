@@ -1,4 +1,4 @@
-package ord.phstudy.ehc;
+package org.phstudy.ehc.domain;
 
 public class Record {
     public static final String DEFAULT_CID = ",,,,";
@@ -38,8 +38,8 @@ public class Record {
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
-                    .append(device).append(comma)
-                    .append(uid).append(comma)
+                    .append(charToDevice(device)).append(comma)
+                    //.append(uid).append(comma)
                     .append("".equals(uid) ? 'N' : 'Y').append(comma) // isLogin
                     .append(price).append(comma)
                     .append(buy).append(comma)
@@ -53,8 +53,8 @@ public class Record {
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
-                    .append(device).append(comma)
-                    .append(uid).append(comma)
+                    .append(charToDevice(device)).append(comma)
+                    //.append(uid).append(comma)
                     .append("".equals(uid) ? 'N' : 'Y').append(comma)
                     .append(price);
         }
@@ -79,7 +79,7 @@ public class Record {
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
                     .append("device").append(comma)
-                    .append("uid").append(comma)
+                    //.append("uid").append(comma)
                     .append("login").append(comma)
                     .append("price").append(comma)
                     .append("buy").append(comma)
@@ -98,11 +98,33 @@ public class Record {
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
                     .append("device").append(comma)
-                    .append("uid").append(comma)
+                    //.append("uid").append(comma)
                     .append("login").append(comma)
                     .append("price");
         }
 
         return sb.toString();
+    }
+
+    public static String charToDevice(char c) {
+        switch (c) {
+            case 'A':
+                return "iPhone";
+            case 'B':
+                return "iPad";
+            case 'C':
+                return "Android";
+            default:
+                return "Other";
+        }
+    }
+
+    public static String charToBooleanString(char c) {
+        switch (c) {
+            case 'Y':
+                return "TRUE";
+            default:
+                return "FALSE";
+        }
     }
 }

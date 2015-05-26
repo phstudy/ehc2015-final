@@ -1,4 +1,4 @@
-package ord.phstudy.ehc;
+package org.phstudy.ehc.utils;
 
 /**
  * Created by study on 5/19/15.

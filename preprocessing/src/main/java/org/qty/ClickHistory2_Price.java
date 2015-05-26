@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import ord.phstudy.ehc.PriceUtils;
+import org.phstudy.ehc.utils.PriceUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -27,7 +27,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
-import file.FileManager;
+import org.qty.file.FileManager;
 
 public class ClickHistory2_Price {
 
