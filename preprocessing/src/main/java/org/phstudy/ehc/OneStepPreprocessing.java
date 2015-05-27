@@ -159,6 +159,10 @@ public class OneStepPreprocessing {
             return;
         }
         String eruid = ExtractorUtils.extractEruid(line);
+        if(eruid == null) {
+            return;
+        }
+
         String key = pid + eruid;
 
         Record record;
@@ -171,7 +175,7 @@ public class OneStepPreprocessing {
         } else {
             record = new Record();
             record.isTrain = isTrain;
-            record.cid = ExtractorUtils.extractCategory(line);
+            record.cid = ExtractorUtils.extractCategory(pid, line);
             record.pid = pid;
             record.uid = ExtractorUtils.extractUid(line);
             //record.ip = ExtractorUtils.extractIp(line);
@@ -192,6 +196,9 @@ public class OneStepPreprocessing {
 
     public static void processCart(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
+        if(eruid == null) {
+            return;
+        }
         String plist = ExtractorUtils.extractPlist(line);
         String[] products = plist.split(",");
 
@@ -213,6 +220,9 @@ public class OneStepPreprocessing {
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
+                    if(Record.DEFAULT_CID.equals(record.cid)) {
+                        record.cid = ExtractorUtils.extractPredefinedCategory(pid);
+                    }
                     record.pid = pid;
                     record.price = price;
                     record.uid = ExtractorUtils.extractUid(line);
@@ -231,6 +241,9 @@ public class OneStepPreprocessing {
 
     public static void processOrder(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
+        if(eruid == null) {
+            return;
+        }
         String plist = ExtractorUtils.extractPlist(line);
         String[] products = plist.split(",");
 
@@ -253,6 +266,9 @@ public class OneStepPreprocessing {
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
+                    if(Record.DEFAULT_CID.equals(record.cid)) {
+                        record.cid = ExtractorUtils.extractPredefinedCategory(pid);
+                    }
                     record.pid = pid;
                     record.num = num;
                     record.price = price;

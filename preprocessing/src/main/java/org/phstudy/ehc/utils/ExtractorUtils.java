@@ -1,5 +1,7 @@
 package org.phstudy.ehc.utils;
 
+import org.phstudy.ehc.domain.Record;
+
 /**
  * Created by study on 5/19/15.
  */
@@ -22,38 +24,39 @@ public class ExtractorUtils {
     // C:Android
     // D:Other
 
-    public static String extractCategory(String line) {
-//        int catIdx = line.indexOf("cat=", MIN_CATEGORY_POS);
-//        String cids = "";
-//        if (catIdx != -1) {
-//            int endCatIdx = line.indexOf(";", catIdx + 4);
-//            cids = line.substring(catIdx + 4, endCatIdx);
-//            if (cids.charAt(1) == '_') {
-//                String[] cparts = cids.split("_");
-//
-//                StringBuilder sb = new StringBuilder(49);
-//                StringBuilder sb2 = new StringBuilder(17);
-//                sb2.append(cparts[0]);
-//                sb.append(cparts[0]);
-//                for (int i = 1; i < cparts.length; i++) {
-//                    sb2.append("_").append(cparts[i]);
-//                    sb.append(",").append(sb2);
-//                }
-//                for (int i = cparts.length; i <= 4; i++) {
-//                    sb.append(",");
-//                }
-//                cids = sb.toString();
-//            } else {
-//                int commaCount = CharMatcher.is(',').countIn(cids);
-//                cids = cids + Strings.repeat(",", 4 - commaCount);
-//            }
-//        }
-
+    public static String extractCategory(String pid, String line) {
         int catIdx = line.indexOf("cat=", MIN_CATEGORY_POS);
-        String cids = ",,,,";
+        String cids;
         if (catIdx != -1) {
             int endCatIdx = line.indexOf(";", catIdx + 4);
             cids = line.substring(catIdx + 4, endCatIdx);
+            if (cids.charAt(1) != '_') {
+                cids = cids.substring(cids.lastIndexOf(',') + 1);
+            }
+
+            String[] cparts = cids.split("_");
+
+            StringBuilder sb = new StringBuilder(49);
+            sb.append(cparts[0]);
+            for (int i = 1; i < cparts.length; i++) {
+                sb.append(",").append(cparts[0]).append(cparts[i]);
+            }
+            for (int i = cparts.length; i <= 4; i++) {
+                sb.append(",");
+            }
+            cids = sb.toString();
+        } else {
+            cids = extractPredefinedCategory(pid);
+        }
+
+        return cids;
+    }
+
+    public static String extractPredefinedCategory(String pid) {
+        String cids = Record.DEFAULT_CID;
+        if (CategoryUtils.categories.containsKey(pid)) {
+            cids = CategoryUtils.categories.get(pid);
+
             if (cids.charAt(1) != '_') {
                 cids = cids.substring(cids.lastIndexOf(',') + 1);
             }
@@ -77,13 +80,24 @@ public class ExtractorUtils {
 
     public static String extractEruid(String line) {
         int eruidIdx = line.indexOf("erUid=", MIN_ERUID_POS) + 6;
+//        if(eruidIdx == 5) {
+//            //System.out.println("eruid is null: " + line);
+//            return null;
+//        }
+
         int endEruidIdx = line.indexOf(";", eruidIdx);
 
         if (endEruidIdx < 0) {
             endEruidIdx = line.indexOf(" ", eruidIdx);
         }
 
-        return (line.substring(eruidIdx + 9, eruidIdx + 20) + line.charAt(endEruidIdx - 1)).replace("-", "");
+        String eruid = (line.substring(eruidIdx + 9, eruidIdx + 20) + line.charAt(endEruidIdx - 1)).replace("-", "");
+//        if(eruid.contains("302 160")) {
+//            System.out.println("eruid is empty: " + line);
+//            return null;
+//        }
+
+        return eruid;
     }
 
     public static String extractPlist(String line) {
@@ -131,8 +145,8 @@ public class ExtractorUtils {
         String ua = line.substring(uaIdx + 3);
 
         char device = 'D'; // other
-        for(int i =0; i < DEVICIES_STR.length; i++) {
-            if(ua.contains(DEVICIES_STR[i])) {
+        for (int i = 0; i < DEVICIES_STR.length; i++) {
+            if (ua.contains(DEVICIES_STR[i])) {
                 device = DEVICIES[i];
                 break;
             }
