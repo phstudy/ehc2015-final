@@ -65,8 +65,8 @@ public class ItemCounter<Key> {
         counter.put(s, new AtomicInteger(1));
     }
 
-    public boolean containsKey(String eruid) {
-        return counter.containsKey(eruid);
+    public boolean containsKey(Key s) {
+        return counter.containsKey(s);
     }
 
     public String ratio(String s, double base) {
@@ -84,6 +84,14 @@ public class ItemCounter<Key> {
 
     public int getValue(Key key) {
         return counter.get(key).intValue();
+    }
+
+    public int getValueOrZero(Key key) {
+        try {
+            return counter.get(key).intValue();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public void setValue(Key key, int newValue) {

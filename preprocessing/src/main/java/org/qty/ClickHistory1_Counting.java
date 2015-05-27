@@ -60,9 +60,9 @@ public class ClickHistory1_Counting {
 
     public static void main(String[] args) throws Exception {
 
-        int pruneGreaterThanThreshold = 500;
-        int pruneLessThanThreshold = 0;
-        int keepLastN = 10;
+        int pruneGreaterThanThreshold = 2000;
+        int pruneLessThanThreshold = 2;
+        int keepLastN = 400;
 
         if (args.length == 3) {
             pruneLessThanThreshold = NumberUtils.toInt(args[0]);
