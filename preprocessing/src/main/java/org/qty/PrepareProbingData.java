@@ -5,6 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Joiner;
 
@@ -57,18 +61,46 @@ public class PrepareProbingData {
             int startIndex = i;
             int endIndex = startIndex + 20;
 
+            ArrayList<String> udnIDfileContent = new ArrayList<String>();
             ArrayList<String> fileContent = new ArrayList<String>();
             int rank = 1;
             for (Entry<String, Long> entry : list.subList(startIndex, endIndex)) {
                 //                fileContent.add(String.format("%02d,%s", rank, entry.getKey()));
+                String key = entry.getKey();
                 fileContent.add(String.format("%s", entry.getKey()));
+                udnIDfileContent.add(extraceTitle(key));
                 rank++;
             }
 
             Writer writer = new FileWriter(String.format(dir + "/%03d_%03d.txt", startIndex, endIndex));
             writer.write(Joiner.on("\n").join(fileContent));
             writer.close();
+
+            Writer udnWriter = new FileWriter(String.format(dir + "/UDN_%03d_%03d.txt", startIndex, endIndex));
+            udnWriter.write(Joiner.on("\n").join(udnIDfileContent));
+            udnWriter.close();
         }
+    }
+
+    protected static String extraceTitle(String key) {
+        try {
+            URL u = new URL(
+                    "http://shopping.udn.com/mall/cus/cat/Cc1c10.do?dc_btn_0=Func_FormalPreview&dc_cargxuid_0=U"
+                            + key.substring(0, key.length() - 1));
+            HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+            for (String line : IOUtils.readLines(huc.getInputStream())) {
+                if (StringUtils.contains(line, "title>")) {
+                    return key + " " + StringUtils.substringBetween(line, "title>", "</titl");
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return key + " unknown";
     }
 
 }
