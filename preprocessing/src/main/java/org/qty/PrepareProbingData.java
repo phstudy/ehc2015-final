@@ -2,6 +2,7 @@ package org.qty;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ import com.google.common.base.Joiner;
 public class PrepareProbingData {
 
     public static void main(String[] args) throws Exception {
+        generateProberList("prober", false);
+        generateProberList("prober13", true);
+    }
+
+    protected static void generateProberList(String dir, boolean selectCode13) throws IOException {
         InputStream input = PrepareProbingData.class.getResourceAsStream("/traindata_hadoop_stat.txt");
         Iterator<String> it = IOUtils.lineIterator(input, "utf-8");
         Map<String, Long> data = new HashMap<String, Long>();
@@ -38,7 +44,16 @@ public class PrepareProbingData {
             }
         });
 
-        new File("prober").mkdirs();
+        if (selectCode13) {
+            Iterator<Entry<String, Long>> filterIt = list.iterator();
+            while (filterIt.hasNext()) {
+                if (filterIt.next().getKey().length() != 13) {
+                    filterIt.remove();
+                }
+            }
+        }
+
+        new File(dir).mkdirs();
         for (int i = 0; i < 100; i += 20) {
             System.out.println(i);
             int startIndex = i;
@@ -51,11 +66,10 @@ public class PrepareProbingData {
                 rank++;
             }
 
-            Writer writer = new FileWriter(String.format("prober/%03d_%03d.txt", startIndex, endIndex));
+            Writer writer = new FileWriter(String.format(dir + "/%03d_%03d.txt", startIndex, endIndex));
             writer.write(Joiner.on("\n").join(fileContent));
             writer.close();
         }
-
     }
 
 }
