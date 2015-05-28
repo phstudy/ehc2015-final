@@ -60,7 +60,8 @@ public class PrepareProbingData {
             ArrayList<String> fileContent = new ArrayList<String>();
             int rank = 1;
             for (Entry<String, Long> entry : list.subList(startIndex, endIndex)) {
-                fileContent.add(String.format("%02d,%s", rank, entry.getKey()));
+                //                fileContent.add(String.format("%02d,%s", rank, entry.getKey()));
+                fileContent.add(String.format("%s", entry.getKey()));
                 rank++;
             }
 
