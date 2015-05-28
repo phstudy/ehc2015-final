@@ -16,6 +16,7 @@ public class CategoryUtils {
 
     static {
         loadPriceFromData("/category.csv");
+        loadPriceFromData("/category_pid_interpolation.csv");
     }
 
     public static void loadPriceFromData(String classpathLocation) {

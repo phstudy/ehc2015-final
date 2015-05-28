@@ -208,6 +208,10 @@ public class OneStepPreprocessing {
 
             for (int i = 0; i < len; i += 3) {
                 String pid = products[i];
+                if(pid.length() == 13) { // skip pid with 13 digits
+                    continue;
+                }
+
                 String key = pid + eruid;
                 int price = Integer.parseInt(products[i + 2]);
 
@@ -251,6 +255,10 @@ public class OneStepPreprocessing {
         if (products.length > 1) { // has Product ?
             for (int i = 0; i < products.length; i += 3) {
                 String pid = products[i];
+                if(pid.length() == 13) { // skip pid with 13 digits
+                    continue;
+                }
+
                 String key = pid + eruid;
                 short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
