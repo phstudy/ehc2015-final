@@ -1,11 +1,11 @@
 package org.phstudy.ehc.tools;
 
-import org.qty.file.FileManager;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.qty.file.FileManager;
 
 /**
  * Created by study on 5/26/15.
