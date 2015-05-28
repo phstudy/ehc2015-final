@@ -21,11 +21,11 @@ import com.google.common.base.Joiner;
 public class PrepareProbingData {
 
     public static void main(String[] args) throws Exception {
-        generateProberList("prober", false);
-        generateProberList("prober13", true);
+        generateProberList("prober", 10);
+        generateProberList("prober13", 13);
     }
 
-    protected static void generateProberList(String dir, boolean selectCode13) throws IOException {
+    protected static void generateProberList(String dir, int pidLength) throws IOException {
         InputStream input = PrepareProbingData.class.getResourceAsStream("/traindata_hadoop_stat.txt");
         Iterator<String> it = IOUtils.lineIterator(input, "utf-8");
         Map<String, Long> data = new HashMap<String, Long>();
@@ -44,12 +44,10 @@ public class PrepareProbingData {
             }
         });
 
-        if (selectCode13) {
-            Iterator<Entry<String, Long>> filterIt = list.iterator();
-            while (filterIt.hasNext()) {
-                if (filterIt.next().getKey().length() != 13) {
-                    filterIt.remove();
-                }
+        Iterator<Entry<String, Long>> filterIt = list.iterator();
+        while (filterIt.hasNext()) {
+            if (filterIt.next().getKey().length() != pidLength) {
+                filterIt.remove();
             }
         }
 
