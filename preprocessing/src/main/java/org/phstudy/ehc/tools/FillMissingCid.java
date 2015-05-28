@@ -22,15 +22,16 @@ public class FillMissingCid {
         BufferedReader c1Br = FileManager.fileAsReader("all_category.csv");
         BufferedReader noclassBr = FileManager.fileAsReader("noclass.csv");
 
-        Set<Long> pidset = new HashSet<>(200000);
+        Set<Long> pidset = new HashSet<Long>(200000);
 
-        List<Long> pids = new ArrayList<>(200000);
-        Map<Long, Category> pidMapping = new HashMap<>(200000);
+        List<Long> pids = new ArrayList<Long>(200000);
+        Map<Long, Category> pidMapping = new HashMap<Long, Category>(200000);
 
         BufferedWriter cWb = FileManager.fileAsWriter("all_category2.csv");
 
         AtomicInteger cnt = new AtomicInteger(0);
-        c1Br.lines().forEach(line -> {
+        String line;
+        while ((line = c1Br.readLine()) != null) {
             try {
                 cnt.incrementAndGet();
                 if (cnt.intValue() % 10000 == 0) {
@@ -53,12 +54,12 @@ public class FillMissingCid {
             } catch (Exception e) {
                 System.out.println(line);
             }
-        });
+        }
         pidset.clear();
 
         AtomicInteger cnt2 = new AtomicInteger(0);
 
-        noclassBr.lines().forEach(line -> {
+        while ((line = noclassBr.readLine()) != null) {
             try {
                 cnt2.incrementAndGet();
                 if (cnt2.intValue() % 10000 == 0) {
@@ -67,7 +68,7 @@ public class FillMissingCid {
 
                 String str[] = line.split(",");
                 String pidStr = str[0];
-                if(str[0].contains("_")) {
+                if (str[0].contains("_")) {
                     str[0] = str[0].split("_")[0];
                 }
                 long pid = Long.parseLong(str[0]);
@@ -101,7 +102,7 @@ public class FillMissingCid {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }
 
 
         cWb.flush();

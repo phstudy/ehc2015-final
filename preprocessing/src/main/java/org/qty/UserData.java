@@ -1,25 +1,19 @@
 package org.qty;
 
-import static org.qty.QLabInitConfig.NO_PID;
-
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Stopwatch;
 import org.apache.commons.lang3.StringUtils;
 import org.phstudy.ehc.utils.PriceUtils;
 import org.qty.file.FileManager;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Stopwatch;
+import java.io.Writer;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.qty.QLabInitConfig.NO_PID;
+
 
 public class UserData {
 

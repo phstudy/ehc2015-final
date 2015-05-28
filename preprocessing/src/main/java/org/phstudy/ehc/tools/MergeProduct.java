@@ -3,6 +3,7 @@ package org.phstudy.ehc.tools;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.qty.file.FileManager;
@@ -67,13 +68,18 @@ public class MergeProduct {
             }
         }
 
-        map.forEach((key, val) -> {
+        Iterator<String> it = map.keySet().iterator();
+        while(it.hasNext()) {
+            String key = it.next();
+            Rec val = map.get(key);
+
             try {
                 productWb.write(val.pid + "," + val.price + "," + val.upid + "," + val.desc + "\n");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }
+
         productWb.flush();
         productWb.close();
     }
