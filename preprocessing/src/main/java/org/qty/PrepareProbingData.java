@@ -19,6 +19,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.phstudy.ehc.utils.PriceUtils;
 
 import com.google.common.base.Joiner;
 
@@ -83,24 +85,42 @@ public class PrepareProbingData {
     }
 
     protected static String extraceTitle(String key) {
+        int price = -1;
+
         try {
+            if (PriceUtils.prices.containsKey(key)) {
+                price = PriceUtils.prices.get(key);
+            }
             URL u = new URL(
                     "http://shopping.udn.com/mall/cus/cat/Cc1c10.do?dc_btn_0=Func_FormalPreview&dc_cargxuid_0=U"
                             + key.substring(0, key.length() - 1));
             HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+
+            boolean priceFlag = false;
+            String title = null;
             for (String line : IOUtils.readLines(huc.getInputStream())) {
+                if (priceFlag) {
+                    String priceLine = StringUtils.substringBetween(line, ">", "<");
+                    // 只留數字
+                    price = NumberUtils.toInt(priceLine.replaceAll("[^0-9]+", ""), -1);
+                    priceFlag = false;
+                }
                 if (StringUtils.contains(line, "title>")) {
-                    return key + " " + StringUtils.substringBetween(line, "title>", "</titl");
+                    title = StringUtils.substringBetween(line, "title>", "</titl");
+                }
+                if (StringUtils.contains(line, "網路價：")) {
+                    priceFlag = true;
                 }
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+
+            return key + "," + price + "," + title;
+
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return key + " unknown";
+        return key + "," + price + ",unknown";
     }
 
 }
