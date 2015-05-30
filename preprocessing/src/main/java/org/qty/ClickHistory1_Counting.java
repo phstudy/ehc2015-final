@@ -61,7 +61,7 @@ public class ClickHistory1_Counting {
     public static void main(String[] args) throws Exception {
 
         int pruneGreaterThanThreshold = 2000;
-        int pruneLessThanThreshold = 2;
+        int pruneLessThanThreshold = 100;
         int keepLastN = 400;
 
         if (args.length == 3) {
@@ -173,7 +173,9 @@ public class ClickHistory1_Counting {
             Set<String> output = Sets.newHashSet();
             for (Entry<String, AtomicInteger> e : list.subList(0, topN)) {
                 output.add(e.getKey());
+                System.out.println(e);
             }
+            
 
             SetView<String> view = Sets.intersection(Answer.getPidSet(), Sets.newHashSet(output));
             System.out.println("compare with top [" + topN + "] " + view.size());

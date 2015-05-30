@@ -1,19 +1,25 @@
 package org.qty;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.base.Stopwatch;
+import static org.qty.QLabInitConfig.NO_PID;
+
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.phstudy.ehc.utils.PriceUtils;
 import org.qty.file.FileManager;
 
-import java.io.Writer;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.qty.QLabInitConfig.NO_PID;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Stopwatch;
 
 public class UserData {
 
@@ -60,6 +66,9 @@ public class UserData {
             }
 
             String cat = mainCategory(s);
+            if ("_".equals(cat)) {
+                continue;
+            }
             manager.viewAction(eruid, pid, cat);
 
         }
@@ -103,9 +112,11 @@ public class UserData {
         public void dump(String filename) throws Exception {
 
             Writer w = FileManager.fileAsWriter(filename);
+            Writer ew = FileManager.fileAsWriter("eruid_" + filename);
 
             List<String> allCates = getCategoryList();
             ArrayList<Object> output = new ArrayList<Object>();
+            ArrayList<Object> erOutput = new ArrayList<Object>();
 
             output.add("viewcount");
             output.add("uniq_viewcount");
@@ -115,6 +126,9 @@ public class UserData {
             output.add("max_cat");
             output.add("price");
             output.add("buy");
+            
+            erOutput.addAll(output);
+            erOutput.add(0, "eruid");
             w.write(Joiner.on(",").join(output) + "\n");
 
             //
@@ -122,6 +136,7 @@ public class UserData {
 
             for (String user : userViewCount.keySet()) {
                 output.clear();
+                erOutput.clear();
 
                 long viewCount = 0;
                 for (AtomicInteger v : userViewCount.get(user).counter.values()) {
@@ -158,6 +173,11 @@ public class UserData {
                 // buy or not buy
                 output.add(orderMarkers.contains(user) ? "1" : "0");
                 w.write(Joiner.on(",").join(output) + "\n");
+                
+                erOutput.add(user);
+                erOutput.addAll(output);
+                ew.write(Joiner.on(",").join(erOutput) + "\n");
+
             }
 
             // 輸入每行 1 個 user 
