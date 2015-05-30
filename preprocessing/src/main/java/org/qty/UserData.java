@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.phstudy.ehc.utils.PriceUtils;
 import org.qty.file.FileManager;
 
 import com.google.common.base.Joiner;
@@ -31,6 +30,12 @@ public class UserData {
     static String pid(String line) {
         String s = StringUtils.substringBetween(line, "pid=", ";");
         return Optional.fromNullable(s).or(NO_PID);
+    }
+
+    static int numOfPids(String line) {
+        String s = StringUtils.substringBetween(line, "plist=", ";");
+        String[] ss = s.split(",");
+        return ss.length % 3 == 0 ? ss.length / 3 : 0;
     }
 
     static String mainCategory(String line) {
@@ -57,7 +62,7 @@ public class UserData {
             }
 
             if (s.contains("act=o")) {
-                manager.order(eruid);
+                manager.order(eruid, numOfPids(s));
                 continue;
             }
 
@@ -69,6 +74,7 @@ public class UserData {
             if ("_".equals(cat)) {
                 continue;
             }
+            //            System.out.println(pid+"_" + cat);
             manager.viewAction(eruid, pid, cat);
 
         }
@@ -88,6 +94,7 @@ public class UserData {
         Map<String, Set<String>> userUniqueCatCount = new HashMap<String, Set<String>>();
 
         Set<String> orderMarkers = new HashSet<String>();
+        ItemCounter<String> buyCount = new ItemCounter<String>();
 
         public void viewAction(String eruid, String pid, String cat) {
             if (!userViewCount.containsKey(eruid)) {
@@ -105,8 +112,9 @@ public class UserData {
             userUniqueCatCount.get(eruid).add(cat);
         }
 
-        public void order(String eruid) {
+        public void order(String eruid, int pidlist) {
             orderMarkers.add(eruid);
+            buyCount.count(eruid);
         }
 
         public void dump(String filename) throws Exception {
@@ -124,12 +132,13 @@ public class UserData {
                 output.add("cat_" + c);
             }
             output.add("max_cat");
-            output.add("price");
+            output.add("buyCount");
             output.add("buy");
-            
+
             erOutput.addAll(output);
             erOutput.add(0, "eruid");
             w.write(Joiner.on(",").join(output) + "\n");
+            ew.write(Joiner.on(",").join(erOutput) + "\n");
 
             //
             //
@@ -160,20 +169,12 @@ public class UserData {
                     output.add(v);
                 }
                 output.add(maxCateName);
-
-                long price = 0;
-                for (String pid : userUniqueViewCount.get(user)) {
-                    //                    
-                    if (PriceUtils.prices.containsKey(pid)) {
-                        price += PriceUtils.prices.get(pid);
-                    }
-                }
-                output.add(price);
+                output.add(buyCount.getValueOrZero(user));
 
                 // buy or not buy
                 output.add(orderMarkers.contains(user) ? "1" : "0");
                 w.write(Joiner.on(",").join(output) + "\n");
-                
+
                 erOutput.add(user);
                 erOutput.addAll(output);
                 ew.write(Joiner.on(",").join(erOutput) + "\n");
