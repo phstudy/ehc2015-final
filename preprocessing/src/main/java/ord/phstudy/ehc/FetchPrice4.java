@@ -35,13 +35,13 @@ public class FetchPrice4 {
                 new LinkedBlockingDeque<Runnable>(capacity),
                 new ThreadPoolExecutor.CallerRunsPolicy());
 
-        sourceBr = FileManager.fileAsReader("train_zero.csv");
-        targetBw = FileManager.fileAsWriter("products_full_v2.csv");
+        sourceBr = FileManager.fileAsReader("high_price.csv");
+        targetBw = FileManager.fileAsWriter("high_price_full.csv");
 
         String line;
 
         while ((line = sourceBr.readLine()) != null) {
-            if(cnt.intValue() % 10000 == 0) {
+            if (cnt.intValue() % 10000 == 0) {
                 targetBw.flush();
                 System.out.println(cnt.incrementAndGet());
             }
@@ -64,11 +64,11 @@ public class FetchPrice4 {
 
         @Override
         public void run() {
-            String[] parts = line.split(","); // 0005949565,0,U000594956,
-            String pid = parts[0];
+            //String[] parts = line.split(","); // 0005949565,0,U000594956,
+            String pid = line;
             //String upid = parts[2];
             //String title = "";
-            String price = parts[1];
+            //String price = parts[1];
 
             String upid = "U" + pid.substring(0, pid.length() - 1);
 
@@ -76,16 +76,13 @@ public class FetchPrice4 {
 //                title = parts[3];
 //            }
 
-            if(pids.contains(upid)) {
+            if (pids.contains(upid)) {
                 return;
             } else {
                 pids.add(upid);
             }
 
             try {
-                if (!"0".equals(price)) { // skip
-                    return;
-                }
                 String url = bashUrl + upid;
                 Document doc = Jsoup.connect(url)
                         .get();
@@ -97,11 +94,19 @@ public class FetchPrice4 {
 
                     Elements divs = doc.select("div[class=pdtInfo_02]");
                     if (divs.size() > 1) {
-                        Elements values = divs.get(1).select("td[class=way2]");
+                        Elements values = divs.get(divs.size() - 1).select("td[class=way2]");
                         if (values.size() > 0) {
-                            price = values.get(0).text().replace("元", "").replace(",", "，").trim();
+                            for (int i = values.size() - 1; i >= 0; i--) {
+                                try {
+                                    int price = Integer.parseInt(values.get(i).text().replace("元", "").replace(",", "，").trim());
+                                    targetBw.write(pid + "," + price + "," + upid + "," + title + "\n");
+                                    System.out.println(pid + "," + price + "," + upid + "," + title);
 
-                            targetBw.write(pid + "," + price + "," + upid + "," + title + "\n");
+                                    break;
+                                } catch (Exception e) {
+
+                                }
+                            }
                         }
                     }
 
