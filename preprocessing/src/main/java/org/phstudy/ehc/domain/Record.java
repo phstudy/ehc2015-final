@@ -22,7 +22,7 @@ public class Record {
     public char eturec = DEFAULT_ETUREC;
     public String weekOfDay;
     public char buy = DEFAULT_BUY;
-    public short viewnum = 1;
+    public int viewnum = 1;
     public int price = 0;
     public short num = 0;
 

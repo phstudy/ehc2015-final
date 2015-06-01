@@ -3,6 +3,7 @@ package org.phstudy.ehc;
 import com.google.common.collect.Maps;
 import org.phstudy.ehc.domain.Record;
 import org.phstudy.ehc.utils.ExtractorUtils;
+import org.phstudy.ehc.utils.GuessUtils;
 import org.phstudy.ehc.utils.PriceUtils;
 import org.qty.file.FileManager;
 
@@ -23,6 +24,8 @@ public class OneStepPreprocessing {
     final static Map<String, Record> records = Maps.newConcurrentMap();
 
     static boolean writeHeader = false;
+    static boolean applyGuess = true;
+
 
     public static void main(String[] args) throws Exception {
 
@@ -92,6 +95,11 @@ public class OneStepPreprocessing {
             String key = it.next();
             Record record = records.get(key);
             String pid = record.pid;
+
+            if (applyGuess && GuessUtils.guess.contains(pid)) {
+                continue;
+            }
+
             String upid = Record.pidToUpid(record.pid);
             if (record.cid.charAt(0) == ',' && categories.containsKey(upid)) {
                 record.cid = categories.get(upid);
@@ -119,6 +127,11 @@ public class OneStepPreprocessing {
             String key = it.next();
             Record record = records.get(key);
             String pid = record.pid;
+
+            if (applyGuess && GuessUtils.guess.contains(pid)) {
+                continue;
+            }
+
             String upid = Record.pidToUpid(record.pid);
             if (record.cid.charAt(0) == ',' && categories.containsKey(upid)) {
                 record.cid = categories.get(upid);
@@ -202,6 +215,7 @@ public class OneStepPreprocessing {
                 Record record;
                 if (records.containsKey(key)) {
                     record = records.get(key);
+                    record.pid = pid;
                     record.price = price;
                 } else {
                     record = new Record();
@@ -249,6 +263,7 @@ public class OneStepPreprocessing {
                 Record record;
                 if (records.containsKey(key)) {
                     record = records.get(key);
+                    record.pid = pid;
                     record.num += num; // same order sometimes appears multiple times...
                     record.price = price;
                     record.buy = 'Y';
