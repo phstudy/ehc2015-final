@@ -2,6 +2,7 @@ package org.phstudy.ehc.utils;
 
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
+import org.phstudy.ehc.domain.Record;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -25,9 +26,9 @@ public class CategoryUtils {
             Iterator<String> it = IOUtils.lineIterator(in, Charset.defaultCharset());
             while (it.hasNext()) {
                 String[] part = it.next().split(",");
-                String uid = part[0];
+                String upid = Record.pidToUpid(part[0]);
                 String category = part[1];
-                categories.put(uid, category);
+                categories.put(upid, category);
             }
             System.out.println("load product category: " + classpathLocation);
         } catch (Exception e) {

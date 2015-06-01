@@ -24,7 +24,7 @@ public class ExtractorUtils {
     // C:Android
     // D:Other
 
-    public static String extractCategory(String pid, String line) {
+    public static String extractCategory(String upid, String line) {
         int catIdx = line.indexOf("cat=", MIN_CATEGORY_POS);
         String cids;
         if (catIdx != -1) {
@@ -46,16 +46,16 @@ public class ExtractorUtils {
             }
             cids = sb.toString();
         } else {
-            cids = extractPredefinedCategory(pid);
+            cids = extractPredefinedCategory(upid);
         }
 
         return cids;
     }
 
-    public static String extractPredefinedCategory(String pid) {
+    public static String extractPredefinedCategory(String upid) {
         String cids = Record.DEFAULT_CID;
-        if (CategoryUtils.categories.containsKey(pid)) {
-            cids = CategoryUtils.categories.get(pid);
+        if (CategoryUtils.categories.containsKey(upid)) {
+            cids = CategoryUtils.categories.get(upid);
 
             if (cids.charAt(1) != '_') {
                 cids = cids.substring(cids.lastIndexOf(',') + 1);
@@ -120,6 +120,13 @@ public class ExtractorUtils {
         int endUidIdx = line.indexOf(";", uidIdx);
 
         return line.substring(uidIdx, endUidIdx);
+    }
+
+    public static short extractDay(String line) {
+        int timeIdx = line.indexOf(":", MIN_HOUR_COLON_POS) + 1;
+        timeIdx -= 12;
+        int day = timeIdx + 2;
+        return Short.parseShort(line.substring(timeIdx, day));
     }
 
     public static short extractHour(String line) {

@@ -19,14 +19,12 @@ import java.util.Set;
 public class OneStepPreprocessing {
     final static int MIN_ACTION_COLON_POS = 56;
 
-    // 290138
     final static Map<String, String> categories = Maps.newConcurrentMap();
     final static Map<String, Record> records = Maps.newConcurrentMap();
 
-    static boolean writeHeader = true;
+    static boolean writeHeader = false;
 
     public static void main(String[] args) throws Exception {
-
 
         long startTime = System.currentTimeMillis();
 
@@ -56,25 +54,6 @@ public class OneStepPreprocessing {
 
         endTime = System.currentTimeMillis();
         System.out.println("Testing dataset generation took " + (endTime - startTime) + " ms");
-
-
-        // no op -> 6 secs
-        // 1 thread no op -> 8 secs
-        // 2 thread no op -> 10 secs
-        // 3 thread no op -> 12 secs
-
-        // "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"GET /action\\?;(.+?) HTTP/1.(\\d+)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"";
-        // regex no op -> 54 secs
-        // 1 thread regex no op -> 26 secs
-        // 2 thread regex no op -> 25 secs
-        // 3 thread regex no op -> 25 secs
-        // 4 thread regex no op -> 30 secs
-        // 8 thread regex no op -> 35 secs
-
-        // line.substring(line.indexOf("[") + 1, line.indexOf("]"));
-        // 1 thread no op -> 8040 ms
-        // 3 thread no op -> 8040 ms
-
     }
 
     public static class Task implements Runnable {
@@ -113,8 +92,9 @@ public class OneStepPreprocessing {
             String key = it.next();
             Record record = records.get(key);
             String pid = record.pid;
-            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
-                record.cid = categories.get(pid);
+            String upid = Record.pidToUpid(record.pid);
+            if (record.cid.charAt(0) == ',' && categories.containsKey(upid)) {
+                record.cid = categories.get(upid);
             }
 
             if (record.price == 0) {
@@ -139,8 +119,9 @@ public class OneStepPreprocessing {
             String key = it.next();
             Record record = records.get(key);
             String pid = record.pid;
-            if (record.cid.charAt(0) == ',' && categories.containsKey(pid)) {
-                record.cid = categories.get(pid);
+            String upid = Record.pidToUpid(record.pid);
+            if (record.cid.charAt(0) == ',' && categories.containsKey(upid)) {
+                record.cid = categories.get(upid);
             }
             if (record.price == 0) {
                 Integer p = PriceUtils.prices.get(pid);
@@ -159,34 +140,37 @@ public class OneStepPreprocessing {
             return;
         }
         String eruid = ExtractorUtils.extractEruid(line);
-        if(eruid == null) {
+        if (eruid == null) {
             return;
         }
 
-        String key = pid + eruid;
+        String upid = Record.pidToUpid(pid);
+        String key = upid + eruid;
 
         Record record;
 
         if (records.containsKey(key)) {
             record = records.get(key);
+            record.day = ExtractorUtils.extractDay(line);
             record.hour = ExtractorUtils.extractHour(line);
             record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
             record.viewnum++;
         } else {
             record = new Record();
             record.isTrain = isTrain;
-            record.cid = ExtractorUtils.extractCategory(pid, line);
+            record.cid = ExtractorUtils.extractCategory(upid, line);
             record.pid = pid;
             record.uid = ExtractorUtils.extractUid(line);
             //record.ip = ExtractorUtils.extractIp(line);
             record.device = ExtractorUtils.extractDevice(line);
             record.eturec = ExtractorUtils.extractEturec(line);
             record.eruid = eruid;
+            record.day = ExtractorUtils.extractDay(line);
             record.hour = ExtractorUtils.extractHour(line);
             record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
 
             if (!record.cid.isEmpty()) {
-                categories.put(record.pid, record.cid);
+                categories.put(upid, record.cid);
             }
 
             records.put(key, record);
@@ -196,7 +180,7 @@ public class OneStepPreprocessing {
 
     public static void processCart(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
-        if(eruid == null) {
+        if (eruid == null) {
             return;
         }
         String plist = ExtractorUtils.extractPlist(line);
@@ -208,11 +192,9 @@ public class OneStepPreprocessing {
 
             for (int i = 0; i < len; i += 3) {
                 String pid = products[i];
-                if(pid.length() == 13) { // skip pid with 13 digits
-                    continue;
-                }
 
-                String key = pid + eruid;
+                String upid = Record.pidToUpid(pid);
+                String key = upid + eruid;
                 int price = Integer.parseInt(products[i + 2]);
 
                 PriceUtils.prices.put(pid, price); // update price
@@ -224,8 +206,8 @@ public class OneStepPreprocessing {
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
-                    if(Record.DEFAULT_CID.equals(record.cid)) {
-                        record.cid = ExtractorUtils.extractPredefinedCategory(pid);
+                    if (Record.DEFAULT_CID.equals(record.cid)) {
+                        record.cid = ExtractorUtils.extractPredefinedCategory(upid);
                     }
                     record.pid = pid;
                     record.price = price;
@@ -233,6 +215,7 @@ public class OneStepPreprocessing {
                     //record.ip = ExtractorUtils.extractIp(line);
                     record.device = ExtractorUtils.extractDevice(line);
                     record.eruid = eruid;
+                    record.day = ExtractorUtils.extractDay(line);
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
 
@@ -245,7 +228,7 @@ public class OneStepPreprocessing {
 
     public static void processOrder(String line, boolean isTrain) {
         String eruid = ExtractorUtils.extractEruid(line);
-        if(eruid == null) {
+        if (eruid == null) {
             return;
         }
         String plist = ExtractorUtils.extractPlist(line);
@@ -255,11 +238,9 @@ public class OneStepPreprocessing {
         if (products.length > 1) { // has Product ?
             for (int i = 0; i < products.length; i += 3) {
                 String pid = products[i];
-                if(pid.length() == 13) { // skip pid with 13 digits
-                    continue;
-                }
 
-                String key = pid + eruid;
+                String upid = Record.pidToUpid(pid);
+                String key = upid + eruid;
                 short num = Short.parseShort(products[i + 1]);
                 int price = Integer.parseInt(products[i + 2]);
 
@@ -274,8 +255,8 @@ public class OneStepPreprocessing {
                 } else {
                     record = new Record();
                     record.isTrain = isTrain;
-                    if(Record.DEFAULT_CID.equals(record.cid)) {
-                        record.cid = ExtractorUtils.extractPredefinedCategory(pid);
+                    if (Record.DEFAULT_CID.equals(record.cid)) {
+                        record.cid = ExtractorUtils.extractPredefinedCategory(upid);
                     }
                     record.pid = pid;
                     record.num = num;
@@ -285,6 +266,7 @@ public class OneStepPreprocessing {
                     record.device = ExtractorUtils.extractDevice(line);
                     record.buy = 'Y';
                     record.eruid = eruid;
+                    record.day = ExtractorUtils.extractDay(line);
                     record.hour = ExtractorUtils.extractHour(line);
                     record.weekOfDay = ExtractorUtils.extractWeekOfDay(line);
 

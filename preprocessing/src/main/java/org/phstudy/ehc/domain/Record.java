@@ -10,6 +10,7 @@ public class Record {
     public String eruid;
     public String cid = DEFAULT_CID;
     public String pid;
+    public short day;
     public short hour;
     public String ip;
     public char device;
@@ -31,10 +32,12 @@ public class Record {
         StringBuilder sb = new StringBuilder(95);
         if (isTrain) {
             sb.append(weekOfDay).append(comma)
+                    .append(day).append(comma)
                     .append(hour).append(comma)
                     .append(eruid).append(comma)
                     .append(cid).append(comma)
                     .append(eturec).append(comma)
+                    .append(pidToUpid(pid)).append(comma)
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
@@ -46,10 +49,12 @@ public class Record {
                     .append(num);
         } else {
             sb.append(weekOfDay).append(comma)
+                    .append(day).append(comma)
                     .append(hour).append(comma)
                     .append(eruid).append(comma)
                     .append(cid).append(comma)
                     .append(eturec).append(comma)
+                    .append(pidToUpid(pid)).append(comma)
                     .append(pid).append(comma)
                     .append(viewnum).append(comma)
                     //.append(ip).append(comma)
@@ -67,6 +72,7 @@ public class Record {
         StringBuilder sb = new StringBuilder(95);
         if (isTrain) {
             sb.append("weekOfDay").append(comma)
+                    .append("day").append(comma)
                     .append("hour").append(comma)
                     .append("eruid").append(comma)
                     .append("class1").append(comma)
@@ -75,6 +81,7 @@ public class Record {
                     .append("class4").append(comma)
                     .append("class5").append(comma)
                     .append("eturec").append(comma)
+                    .append("upid").append(comma)
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
@@ -86,6 +93,7 @@ public class Record {
                     .append("num");
         } else {
             sb.append("weekOfDay").append(comma)
+                    .append("day").append(comma)
                     .append("hour").append(comma)
                     .append("eruid").append(comma)
                     .append("class1").append(comma)
@@ -94,6 +102,7 @@ public class Record {
                     .append("class4").append(comma)
                     .append("class5").append(comma)
                     .append("eturec").append(comma)
+                    .append("upid").append(comma)
                     .append("pid").append(comma)
                     .append("viewnum").append(comma)
                     //.append("ip").append(comma)
@@ -126,5 +135,9 @@ public class Record {
             default:
                 return "FALSE";
         }
+    }
+
+    public static String pidToUpid(String pid) {
+        return pid.substring(0, 9);
     }
 }
