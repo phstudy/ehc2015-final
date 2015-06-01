@@ -24,7 +24,7 @@ public class OneStepPreprocessing {
     final static Map<String, Record> records = Maps.newConcurrentMap();
 
     static boolean writeHeader = false;
-    static boolean applyGuess = true;
+    static boolean skipGuessedPid = false;
 
 
     public static void main(String[] args) throws Exception {
@@ -96,7 +96,7 @@ public class OneStepPreprocessing {
             Record record = records.get(key);
             String pid = record.pid;
 
-            if (applyGuess && GuessUtils.guess.contains(pid)) {
+            if (skipGuessedPid && GuessUtils.guess.contains(pid)) {
                 continue;
             }
 
@@ -128,7 +128,7 @@ public class OneStepPreprocessing {
             Record record = records.get(key);
             String pid = record.pid;
 
-            if (applyGuess && GuessUtils.guess.contains(pid)) {
+            if (skipGuessedPid && GuessUtils.guess.contains(pid)) {
                 continue;
             }
 
