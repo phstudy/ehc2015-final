@@ -35,13 +35,13 @@ public class FetchPrice4 {
                 new LinkedBlockingDeque<Runnable>(capacity),
                 new ThreadPoolExecutor.CallerRunsPolicy());
 
-        sourceBr = FileManager.fileAsReader("high_price.csv");
-        targetBw = FileManager.fileAsWriter("high_price_full.csv");
+        sourceBr = FileManager.fileAsReader("product.csv");
+        targetBw = FileManager.fileAsWriter("product_full.csv");
 
         String line;
 
         while ((line = sourceBr.readLine()) != null) {
-            if (cnt.intValue() % 10000 == 0) {
+            if (cnt.intValue() % 1000 == 0) {
                 targetBw.flush();
                 System.out.println(cnt.incrementAndGet());
             }
@@ -65,12 +65,10 @@ public class FetchPrice4 {
         @Override
         public void run() {
             //String[] parts = line.split(","); // 0005949565,0,U000594956,
-            String pid = line;
+            String upid = line;
             //String upid = parts[2];
             //String title = "";
             //String price = parts[1];
-
-            String upid = "U" + pid.substring(0, pid.length() - 1);
 
 //            if (parts.length > 3) {
 //                title = parts[3];
@@ -83,12 +81,13 @@ public class FetchPrice4 {
             }
 
             try {
-                String url = bashUrl + upid;
+                String url = bashUrl + "U" + upid;
                 Document doc = Jsoup.connect(url)
                         .get();
 
                 Elements titles = doc.select("td[class=pdtname]");
 
+                boolean ok = false;
                 if (titles.size() > 0) {
                     String title = titles.get(0).text().replace(",", "，");
 
@@ -99,9 +98,9 @@ public class FetchPrice4 {
                             for (int i = values.size() - 1; i >= 0; i--) {
                                 try {
                                     int price = Integer.parseInt(values.get(i).text().replace("元", "").replace(",", "，").trim());
-                                    targetBw.write(pid + "," + price + "," + upid + "," + title + "\n");
-                                    System.out.println(pid + "," + price + "," + upid + "," + title);
-
+                                    targetBw.write(upid + "," + price + "," + title + "\n");
+                                    //System.out.println(pid + "," + price + "," + upid + "," + title);
+                                    ok = true;
                                     break;
                                 } catch (Exception e) {
 
@@ -109,8 +108,10 @@ public class FetchPrice4 {
                             }
                         }
                     }
-
-
+                }
+                if(!ok) {
+                    targetBw.write(upid + ",0,\n");
+                    System.out.println(upid + ",0,");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
