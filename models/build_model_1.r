@@ -31,4 +31,4 @@ library(randomForest)
 
 fit <- randomForest(train$buy ~ viewcount + uniq_viewcount + cat_0 + cat_1 + cat_A + cat_B + cat_C + cat_D + cat_E + cat_F + cat_G + cat_H + cat_I + cat_J + cat_K + cat_L + cat_O + cat_V + max_cat + buyCount, data=train, importance=TRUE, ntree=100)
 
-save(fit, file="model_qty_1.rda")
+saveRDS(fit, file="model_qty_1.rda")
