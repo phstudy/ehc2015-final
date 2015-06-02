@@ -1,11 +1,17 @@
 package org.qty;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.collect.Lists;
 
 public class ItemCounter<Key> {
 
@@ -96,5 +102,17 @@ public class ItemCounter<Key> {
 
     public void setValue(Key key, int newValue) {
         counter.get(key).set(newValue);
+    }
+
+    public List<Entry<Key, AtomicInteger>> getTopN(int n) {
+        ArrayList<Entry<Key, AtomicInteger>> list = Lists.newArrayList(counter.entrySet());
+        Collections.sort(list, new Comparator<Entry<Key, AtomicInteger>>() {
+            @Override
+            public int compare(Entry<Key, AtomicInteger> o1, Entry<Key, AtomicInteger> o2) {
+                return o2.getValue().intValue() - o1.getValue().intValue();
+            }
+        });
+
+        return list.subList(0, n);
     }
 }

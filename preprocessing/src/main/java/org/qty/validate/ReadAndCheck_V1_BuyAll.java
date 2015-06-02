@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.qty.ItemCounter;
@@ -20,7 +20,7 @@ import org.qty.file.FileManager;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
-public class ReadAndCheck {
+public class ReadAndCheck_V1_BuyAll {
     static String eruid(String line) {
         String s = StringUtils.substringBetween(line, "erUid=", ";");
         return Optional.fromNullable(s).or("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
@@ -59,10 +59,9 @@ public class ReadAndCheck {
             }
         }
 
-        for (Entry<String, AtomicInteger> item : count.getTopN(10)) {
+        for (Entry<String, AtomicInteger> item : count.getTopN(200)) {
             System.out.println(item);
         }
-
     }
 
     static class UserItemSet {
