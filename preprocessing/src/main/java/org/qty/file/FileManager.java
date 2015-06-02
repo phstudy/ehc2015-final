@@ -14,6 +14,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import au.com.bytecode.opencsv.CSVReader;
+
+import com.google.common.collect.Sets;
+
 public class FileManager {
 
     static String baseDir = "/Users/study/Desktop/EHC";
@@ -97,6 +101,22 @@ public class FileManager {
                 return it;
             }
         };
+    }
+
+    @SuppressWarnings("resource")
+    public static Set<String> readPredictEruidsResult(String resultCsvFile) throws Exception {
+        Set<String> buyUserEruids = Sets.newHashSet();
+        CSVReader reader = new CSVReader(FileManager.fileAsReader(resultCsvFile));
+        while (true) {
+            String[] row = reader.readNext();
+            if (row == null) {
+                break;
+            }
+            if ("1".equals(row[1])) {
+                buyUserEruids.add(row[0]);
+            }
+        }
+        return buyUserEruids;
     }
 
     static void closeManagedResources() {
