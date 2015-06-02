@@ -71,6 +71,15 @@ public class ItemCounter<Key> {
         counter.put(s, new AtomicInteger(1));
     }
 
+    public void count(Key s, int weight) {
+        if (counter.containsKey(s)) {
+            int origin = counter.get(s).get();
+            counter.get(s).set(origin + weight);
+            return;
+        }
+        counter.put(s, new AtomicInteger(weight));
+    }
+
     public boolean containsKey(Key s) {
         return counter.containsKey(s);
     }
