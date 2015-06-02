@@ -13,12 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.qty.Answer;
 import org.qty.ItemCounter;
 import org.qty.QLabInitConfig;
 import org.qty.file.FileManager;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class ReadAndCheck_V1_BuyAll {
     static String eruid(String line) {
@@ -59,9 +61,19 @@ public class ReadAndCheck_V1_BuyAll {
             }
         }
 
-        for (Entry<String, AtomicInteger> item : count.getTopN(200)) {
-            System.out.println(item);
+        showResult(count, 20);
+        showResult(count, 200);
+    }
+
+    protected static void showResult(ItemCounter<String> count, int topN) {
+        Set<String> predict = Sets.newHashSet();
+        for (Entry<String, AtomicInteger> item : count.getTopN(topN)) {
+            predict.add(item.getKey());
         }
+
+        //                System.out.println(predict);
+        //                System.out.println(TestAnswer.ANSWER_PIDS);
+        System.out.println("top" + topN + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
     }
 
     static class UserItemSet {
