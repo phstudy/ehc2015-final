@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,10 +48,15 @@ public class UserData {
 
     public static void main(String[] args) throws Exception {
 
+        if (args.length != 2) {
+            System.out.println("<cmd> <inputFile> <outputFile>");
+            return;
+        }
+        String inputFile = args[0];
+        String outputFile = args[1];
+
         UserManager manager = new UserManager();
-        //
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        for (String s : FileManager.fileAsLineIterator(QLabInitConfig.INPUT_FILE)) {
+        for (String s : FileManager.fileAsLineIterator(inputFile)) {
 
             String eruid = eruid(s);
             String pid = pid(s);
@@ -79,10 +83,7 @@ public class UserData {
 
         }
 
-        System.out.println(stopwatch.elapsed(TimeUnit.SECONDS));
-        String outfile = "qty.lab.csv";
-        manager.dump(outfile);
-        System.out.println(stopwatch.elapsed(TimeUnit.SECONDS));
+        manager.dump(outputFile);
     }
 
     static class UserManager {
@@ -119,8 +120,8 @@ public class UserData {
 
         public void dump(String filename) throws Exception {
 
-            Writer w = FileManager.fileAsWriter(filename);
-            Writer ew = FileManager.fileAsWriter("eruid_" + filename);
+            //            Writer w = FileManager.fileAsWriter(filename);
+            Writer ew = FileManager.fileAsWriter(filename);
 
             List<String> allCates = getCategoryList();
             ArrayList<Object> output = new ArrayList<Object>();
@@ -137,7 +138,7 @@ public class UserData {
 
             erOutput.addAll(output);
             erOutput.add(0, "eruid");
-            w.write(Joiner.on(",").join(output) + "\n");
+            //            w.write(Joiner.on(",").join(output) + "\n");
             ew.write(Joiner.on(",").join(erOutput) + "\n");
 
             //
@@ -173,7 +174,7 @@ public class UserData {
 
                 // buy or not buy
                 output.add(orderMarkers.contains(user) ? "1" : "0");
-                w.write(Joiner.on(",").join(output) + "\n");
+                //                w.write(Joiner.on(",").join(output) + "\n");
 
                 erOutput.add(user);
                 erOutput.addAll(output);

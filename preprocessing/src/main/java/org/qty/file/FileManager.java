@@ -28,7 +28,6 @@ public class FileManager {
         String preferedBaseDir = System.getProperty("EHC_FINAL_DATASET_DIR");
         if (preferedBaseDir != null && new File(preferedBaseDir).exists() && new File(preferedBaseDir).isDirectory()) {
             baseDir = new File(preferedBaseDir).getAbsolutePath();
-            System.err.println("reset base-dir as " + baseDir);
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -166,7 +165,7 @@ public class FileManager {
         while (it.hasNext()) {
             Closeable c = it.next();
             try {
-                System.err.println("close " + c);
+                //                System.err.println("close " + c);
                 c.close();
             } catch (IOException e) {
                 e.printStackTrace();
