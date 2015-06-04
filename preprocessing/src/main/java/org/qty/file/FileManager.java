@@ -61,6 +61,48 @@ public class FileManager {
         return writer;
     }
 
+    @SuppressWarnings("resource")
+    public static Iterable<String[]> fileAsCSVRowIterator(String name) throws Exception {
+        final CSVReader csvReader = new CSVReader(fileAsReader(name));
+        final List<String[]> buffer = new LinkedList<String[]>();
+        final Iterator<String[]> it = new Iterator<String[]>() {
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String[] next() {
+                return buffer.remove(0);
+            }
+
+            @Override
+            public boolean hasNext() {
+                fillBuffer();
+                return !buffer.isEmpty();
+            }
+
+            public void fillBuffer() {
+                try {
+                    String[] s = csvReader.readNext();
+                    if (s != null) {
+                        buffer.add(s);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        return new Iterable<String[]>() {
+
+            @Override
+            public Iterator<String[]> iterator() {
+                return it;
+            }
+        };
+    }
+
     public static Iterable<String> fileAsLineIterator(String name) throws Exception {
         final BufferedReader reader = fileAsReader(name);
         managedResources.add(reader);

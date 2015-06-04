@@ -59,9 +59,9 @@ public class NetworkPriceFetcher {
             cachedPrices.put(pid, -1);
         }
 
-//        if (networkPrice == -1) {
-//            return null;
-//        }
+        //        if (networkPrice == -1) {
+        //            return null;
+        //        }
 
         return networkPrice;
     }
@@ -108,6 +108,13 @@ public class NetworkPriceFetcher {
 
         System.out.println("get " + key + " => " + price);
         return price;
+    }
+
+    public static void update(String pid, String price) {
+        try {
+            cachedPrices.put(pid, NumberUtils.toInt(price));
+        } catch (Exception e) {
+        }
     }
 
     protected static void writeToFile(File data) throws IOException, FileNotFoundException {
