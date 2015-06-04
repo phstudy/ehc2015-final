@@ -39,10 +39,12 @@ public class ProductData {
 
     public static void main(String[] args) throws Exception {
 
+        String inputFile = args[0];
+        String outputFile = args[1];
         Products products = new Products();
         //
         Stopwatch stopwatch = Stopwatch.createStarted();
-        for (String s : FileManager.fileAsLineIterator(QLabInitConfig.TEST_FILE)) {
+        for (String s : FileManager.fileAsLineIterator(inputFile)) {
 
             String eruid = eruid(s);
             String pid = pid(s);
@@ -69,7 +71,7 @@ public class ProductData {
 
         }
 
-        products.dump("qty.test.product.csv");
+        products.dump(outputFile);
         //        System.out.println(stopwatch.elapsed(TimeUnit.SECONDS));
         //        String outfile = "qty.lab.csv";
         //        manager.dump(outfile);
@@ -105,7 +107,6 @@ public class ProductData {
             data.add("buyCount");
             w.write(Joiner.on(",").join(data) + "\n");
 
-            int ccc = 0;
             for (String pid : pidViewCount.counter.keySet()) {
                 data.clear();
 
