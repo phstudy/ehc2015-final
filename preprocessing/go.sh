@@ -1,4 +1,4 @@
-#gradle installApp --offline
+gradle installApp --offline
 workspace=/Users/qrtt1/_ehc_final_data/
 export JAVA_OPTS="-DEHC_FINAL_DATASET_DIR=$workspace"
 
@@ -12,5 +12,6 @@ export JAVA_OPTS="-DEHC_FINAL_DATASET_DIR=$workspace"
 #Rscript generate_user_model.r $workspace userdata_train.csv userdata_test.csv userdata_predict.csv
 #Rscript generate_product_model.r $workspace product_train.csv product_test.csv product_predict.csv
 #preprocessing result5 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 9 result.txt | tail
+#preprocessing result5 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 9 result.txt 
 preprocessing result5 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 9 result.txt 
-#preprocessing result5 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 15 result.txt | tail
+##preprocessing result5 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 15 result.txt | tail

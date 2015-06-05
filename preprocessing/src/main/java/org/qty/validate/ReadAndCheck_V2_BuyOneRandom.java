@@ -23,15 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class ReadAndCheck_V2_BuyOneRandom {
-    static String eruid(String line) {
-        String s = StringUtils.substringBetween(line, "erUid=", ";");
-        return Optional.fromNullable(s).or("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
-    }
-
-    static String pid(String line) {
-        String s = StringUtils.substringBetween(line, "pid=", ";");
-        return Optional.fromNullable(s).or(NO_PID);
-    }
 
     public static void main(String[] args) throws Exception {
         String resultFile = "model_1_result.csv";
@@ -40,8 +31,8 @@ public class ReadAndCheck_V2_BuyOneRandom {
 
         for (String s : FileManager.fileAsLineIterator(QLabInitConfig.TEST_FILE)) {
 
-            String eruid = eruid(s);
-            String pid = pid(s);
+            String eruid = ValidationUtils.eruid(s);
+            String pid = ValidationUtils.pid(s);
 
             if (!s.contains("act=v")) {
                 continue;
