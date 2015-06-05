@@ -49,8 +49,10 @@ public class ReadAndCheck_V5_BuyByPredictBuyCount {
 
         ItemCounter<String> count = new ItemCounter<String>();
 
+        Set<String> orderPids = new HashSet<String>();
         for (Entry<String, List<String>> s : userItemSet.toList()) {
             List<String> viewList = s.getValue();
+            orderPids.addAll(viewList);
             for (String pid : viewList) {
                 if (buyManager.buyIt(pid)) {
                     buy(count, pid);
@@ -58,7 +60,12 @@ public class ReadAndCheck_V5_BuyByPredictBuyCount {
             }
         }
 
-        System.out.println("order size: " + buyUserEruids.size());
+        System.out.println("[data from product model] predict total buy count: " + buyManager.getTotalCount());
+        System.out.println("[data from product model] predict total pid count: " + buyManager.pidCount.keySet().size());
+        
+        System.out.println("[data from order model] predict order count: " + buyUserEruids.size());
+        System.out.println("[data from order model] predict pid count: " + orderPids.size());
+        
         System.out.println("real buy count: " + count.size());
         showResult(count, 20);
         showResult(count, 100);
