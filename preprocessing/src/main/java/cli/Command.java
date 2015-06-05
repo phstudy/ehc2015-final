@@ -8,6 +8,7 @@ import java.util.Map;
 import org.qty.ProductData;
 import org.qty.UserData;
 import org.qty.file.FileManager;
+import org.qty.validate.ReadAndCheck_V5_BuyByPredictBuyCount;
 
 public class Command {
 
@@ -16,9 +17,9 @@ public class Command {
         cmdDesc.put("user", "轉換 log 成 user data");
         cmdDesc.put("product", "轉換 log 成 product data");
         cmdDesc.put("where", "查詢工作區的檔案絕對路徑");
+        cmdDesc.put("result5", "不知不覺亂寫到了第 5 版");
     }
 
-    @SuppressWarnings("unused")
     public static void main(String[] args) {
         if (args.length == 0) {
             dumpCommands();
@@ -48,6 +49,11 @@ public class Command {
 
             if ("where".equals(args[0])) {
                 System.out.println(FileManager.file(args[1]).getAbsolutePath());
+                return;
+            }
+
+            if ("result5".equals(args[0])) {
+                ReadAndCheck_V5_BuyByPredictBuyCount.main(aArgs);
                 return;
             }
 

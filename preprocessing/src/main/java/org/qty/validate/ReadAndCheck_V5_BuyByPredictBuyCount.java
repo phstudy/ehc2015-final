@@ -15,10 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.phstudy.ehc.utils.PriceUtils;
 import org.qty.ItemCounter;
-import org.qty.ProductData;
-import org.qty.QLabInitConfig;
 import org.qty.file.FileManager;
 
 import com.google.common.base.Optional;
@@ -37,11 +34,18 @@ public class ReadAndCheck_V5_BuyByPredictBuyCount {
     }
 
     public static void main(String[] args) throws Exception {
-        String resultFile = "model_1_result.csv";
-        Set<String> buyUserEruids = FileManager.readPredictEruidsResult(resultFile);
+        String logdata = args[0];
+        String usermodel = args[1];
+        String buymodel = args[2];
+        float threshold = Float.valueOf(args[3]);
+        String outputFile = args[4];
+
+        ProductBuyManager buyManager = new ProductBuyManager(buymodel, threshold);
+
+        Set<String> buyUserEruids = FileManager.readPredictEruidsResult(usermodel);
         UserItemSet userItemSet = new UserItemSet();
 
-        for (String s : FileManager.fileAsLineIterator(QLabInitConfig.TEST_FILE)) {
+        for (String s : FileManager.fileAsLineIterator(logdata)) {
 
             String eruid = eruid(s);
             String pid = pid(s);
@@ -60,20 +64,15 @@ public class ReadAndCheck_V5_BuyByPredictBuyCount {
 
         for (Entry<String, List<String>> s : userItemSet.toList()) {
             List<String> viewList = s.getValue();
-            Collections.shuffle(viewList);
-            String pid = viewList.get(0);
-            if (ProductBuyManager.buyIt(pid)) {
-                buy(count, pid);
+            for (String pid : viewList) {
+                if (buyManager.buyIt(pid)) {
+                    buy(count, pid);
+                }
             }
-            //            for (String pid : viewList) {
-            //                if (ProductBuyManager.buyIt(pid)) {
-            //                    buy(count, pid);
-            //                }
-            //            }
         }
 
         System.out.println("order size: " + buyUserEruids.size());
-        System.out.println("csize: " + count.size());
+        System.out.println("real buy count: " + count.size());
         showResult(count, 20);
         showResult(count, 100);
         showResult(count, 200);
@@ -97,9 +96,6 @@ public class ReadAndCheck_V5_BuyByPredictBuyCount {
         for (Entry<String, AtomicInteger> item : count.getTopN(topN)) {
             predict.add(item.getKey());
         }
-
-        //                System.out.println(predict);
-        //                System.out.println(TestAnswer.ANSWER_PIDS);
         System.out.println("top" + topN + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
     }
 
