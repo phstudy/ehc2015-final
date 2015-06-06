@@ -31,8 +31,14 @@ train <- subset(train, buyCount>=1)
 
 install.packages("e1071")
 library(e1071)
-model <- svm(buyCount~., data=train)
 
+# 25m
+#model <- svm(buyCount~., data=train, kernel="polynomial")
+
+# 1m6s
+#model <- svm(buyCount~., data=train, kernel="linear")
+
+model <- svm(buyCount~., data=train)
 
 test <- read.csv(testfile, colClasses=c("pid"="factor"))
 test <- data.frame(test, row.names = "pid")

@@ -77,7 +77,7 @@ public class StatTrainingData {
             }
         });
 
-        for (Entry<String, Long> entry : list.subList(0, 20)) {
+        for (Entry<String, Long> entry : list.subList(0, 100)) {
             System.out.println(String.format("%-16s\t%d\t%s", entry.getKey(), entry.getValue(),
                     extraceTitle(entry.getKey())));
         }
