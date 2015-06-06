@@ -20,7 +20,7 @@ public class ValidationUtils {
         return mapToList(map, true);
     }
 
-    public static <K, V> List<Entry<K, V>> mapToListAscDescOrder(Map<K, V> map) {
+    public static <K, V> List<Entry<K, V>> mapToListDescOrder(Map<K, V> map) {
         return mapToList(map, false);
     }
 

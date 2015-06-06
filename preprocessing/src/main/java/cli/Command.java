@@ -9,6 +9,7 @@ import org.qty.ProductData;
 import org.qty.UserData;
 import org.qty.file.FileManager;
 import org.qty.validate.ReadAndCheck_V5_BuyByPredictBuyCount;
+import org.qty.validate.ReadAndCheck_V6_BuyByPredictBuyCountGA;
 
 public class Command {
 
@@ -18,6 +19,7 @@ public class Command {
         cmdDesc.put("product", "轉換 log 成 product data");
         cmdDesc.put("where", "查詢工作區的檔案絕對路徑");
         cmdDesc.put("result5", "不知不覺亂寫到了第 5 版");
+        cmdDesc.put("result6", "不知不覺亂寫到了第 6 版");
     }
 
     public static void main(String[] args) {
@@ -54,6 +56,11 @@ public class Command {
 
             if ("result5".equals(args[0])) {
                 ReadAndCheck_V5_BuyByPredictBuyCount.main(aArgs);
+                return;
+            }
+            
+            if ("result6".equals(args[0])) {
+                ReadAndCheck_V6_BuyByPredictBuyCountGA.main(aArgs);
                 return;
             }
 
