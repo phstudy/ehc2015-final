@@ -1,7 +1,7 @@
 package org.qty.validate;
 
-import static org.qty.QLabInitConfig.NO_PID;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,27 +9,31 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.StringUtils;
-import org.qty.Answer;
 import org.qty.ItemCounter;
-import org.qty.QLabInitConfig;
 import org.qty.file.FileManager;
+import org.qty.validate.GaImpl.BuyCountChromosome;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class ReadAndCheck_V2_BuyOneRandom {
+public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
 
     public static void main(String[] args) throws Exception {
-        String resultFile = "model_1_result.csv";
-        Set<String> buyUserEruids = FileManager.readPredictEruidsResult(resultFile);
+        String logdata = args[0];
+        String usermodel = args[1];
+        String buymodel = args[2];
+        float threshold = Float.valueOf(args[3]);
+        String outputFile = args[4];
+
+        ProductBuyManager buyManager = new ProductBuyManager(buymodel, threshold);
+
+        Set<String> buyUserEruids = FileManager.readPredictEruidsResult(usermodel);
         UserItemSet userItemSet = new UserItemSet();
 
-        for (String s : FileManager.fileAsLineIterator(QLabInitConfig.TEST_FILE)) {
+        for (String s : FileManager.fileAsLineIterator(logdata)) {
 
             String eruid = ValidationUtils.eruid(s);
             String pid = ValidationUtils.pid(s);
@@ -46,16 +50,48 @@ public class ReadAndCheck_V2_BuyOneRandom {
 
         ItemCounter<String> count = new ItemCounter<String>();
 
+        Set<String> orderPids = new HashSet<String>();
         for (Entry<String, List<String>> s : userItemSet.toList()) {
-            // 隨機挑 1 個
             List<String> viewList = s.getValue();
-            Collections.shuffle(viewList);
-            count.count(viewList.get(0));
+            orderPids.addAll(viewList);
+            for (String pid : viewList) {
+                if (buyManager.buyIt(pid)) {
+                    buy(count, pid);
+                }
+            }
         }
 
-        showResult(count, 20);
-        showResult(count, 200);
-        showResult(count, 2000);
+        System.out.println("[data from product model] predict total buy count: " + buyManager.getTotalCount());
+        System.out.println("[data from product model] predict total pid count: " + buyManager.pidCount.keySet().size());
+
+        System.out.println("[data from order model] predict order count: " + buyUserEruids.size());
+        System.out.println("[data from order model] predict pid count: " + orderPids.size());
+        System.out.println("real buy count: " + count.size());
+
+        // 取 order predict pids、product predict pids 與 price pids 的交集 
+        Set<String> intersection = Sets.intersection(buyManager.pidCount.keySet(), orderPids);
+        Map<String, Integer> priceSubset = NetworkPriceFetcher.buildPriceSet(intersection);
+        intersection = Sets.intersection(intersection, priceSubset.keySet());
+
+        System.out.println("[ga] intersection size: " + intersection.size());
+
+        GaImpl gg = new GaImpl(priceSubset, TestAnswer.ANSWER_PIDS, buyManager.pidWeight);
+        BuyCountChromosome chromosome = gg.evolve();
+
+        showResult(chromosome.itemCounter, 20);
+        showResult(chromosome.itemCounter, 200);
+        showResult(chromosome.itemCounter, intersection.size());
+        NetworkPriceFetcher.savePriceState();
+    }
+
+    protected static void buy(ItemCounter<String> count, String pid) throws FileNotFoundException, IOException {
+        Integer price = NetworkPriceFetcher.lookPrice(pid);
+        if (price == null) {
+            price = 1;
+            System.err.println("no price: " + pid);
+        } else {
+        }
+        count.count(pid, price);
     }
 
     protected static void showResult(ItemCounter<String> count, int topN) {
@@ -63,9 +99,6 @@ public class ReadAndCheck_V2_BuyOneRandom {
         for (Entry<String, AtomicInteger> item : count.getTopN(topN)) {
             predict.add(item.getKey());
         }
-
-        //                System.out.println(predict);
-        //                System.out.println(TestAnswer.ANSWER_PIDS);
         System.out.println("top" + topN + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
     }
 

@@ -124,4 +124,9 @@ public class ItemCounter<Key> {
 
         return list.subList(0, n);
     }
+
+    public Set<Entry<Key, AtomicInteger>> entrySet() {
+        return counter.entrySet();
+    }
+
 }

@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,22 @@ public class NetworkPriceFetcher {
 
     protected static File cachePath() {
         return new File(System.getProperty("user.home"), priceCached);
+    }
+
+    public static Map<String, Integer> buildPriceSet(Set<String> pids) {
+        Map<String, Integer> subset = new HashMap<String, Integer>();
+        for (String pid : pids) {
+            try {
+                Integer price = lookPrice(pid);
+                if (price == null || price <= 0) {
+                    continue;
+                }
+                subset.put(pid, price);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return subset;
     }
 
     public static Integer lookPrice(String pid) throws FileNotFoundException, IOException {
