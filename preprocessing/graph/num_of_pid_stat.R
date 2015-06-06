@@ -1,0 +1,7 @@
+png('num_of_pid_stat.png')
+v<-c(45895, 5309, 1832, 821, 392, 216, 97, 77, 40, 23, 19, 19, 11, 5, 4, 1, 1, 3, 0, 4, 1, 0, 2)
+names(v) <- seq(1, length(v))
+g = barplot(v, ylab = "buy count", xlab = "nums of the pid pick up", ylim=c(0,15000))
+text(1 + g[1], 8000, v[1])
+text(1 + g[2], 6000, v[2])
+dev.off()

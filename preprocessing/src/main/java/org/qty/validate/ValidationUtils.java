@@ -81,4 +81,9 @@ public class ValidationUtils {
         return Optional.fromNullable(s).or(NO_PID);
     }
 
+    public static String plist(String line) {
+        String s = StringUtils.substringBetween(line, "plist=", ";");
+        return StringUtils.isEmpty(s) ? null : s;
+    }
+
 }
