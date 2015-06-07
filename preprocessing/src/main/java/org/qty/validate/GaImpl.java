@@ -36,7 +36,7 @@ public class GaImpl {
 
     // parameters for the GA
     private static final int POPULATION_SIZE = 50;
-    private static final int NUM_GENERATIONS = 20000;
+    private static final int NUM_GENERATIONS = 50000;
     private static final double ELITISM_RATE = 0.2;
     private static final double CROSSOVER_RATE = 1;
     private static final double MUTATION_RATE = 0.2;
@@ -75,6 +75,9 @@ public class GaImpl {
                     if (progress++ % 50 == 0) {
                         int inTop20 = knownInTop20(((BuyCountChromosome) current.getFittestChromosome()).itemCounter);
                         System.out.println(progress + " => " + inTop20 + ", " + current.getFittestChromosome());
+                        if (inTop20 == 16) {
+                            break;
+                        }
                     }
                 }
                 return current;
