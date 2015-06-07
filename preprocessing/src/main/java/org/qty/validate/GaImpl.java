@@ -28,17 +28,18 @@ import org.apache.commons.math3.genetics.TournamentSelection;
 import org.qty.ItemCounter;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class GaImpl {
 
     static Random random = new Random();
 
     // parameters for the GA
-    private static final int POPULATION_SIZE = 50;
-    private static final int NUM_GENERATIONS = 20000;
+    private static final int POPULATION_SIZE = 25;
+    private static final int NUM_GENERATIONS = 10000;
     private static final double ELITISM_RATE = 0.2;
     private static final double CROSSOVER_RATE = 1;
-    private static final double MUTATION_RATE = 0.2;
+    private static final double MUTATION_RATE = 0.5;
     private static final int TOURNAMENT_ARITY = 5;
 
     static Map<String, Integer> priceMap;
@@ -53,6 +54,15 @@ public class GaImpl {
         this.keyOrders = new ArrayList<String>(pidWeight.keySet());
     }
 
+    private int knownInTop20(ItemCounter<String> itemCounter) {
+        Set<String> predict = Sets.newHashSet();
+        for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
+            predict.add(item.getKey());
+        }
+        //        System.out.println("top" + 20 + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
+        return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
+    }
+
     public BuyCountChromosome evolve() {
         GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(new OnePointCrossover<Integer>(), CROSSOVER_RATE,
                 new BuyCountMutation(), MUTATION_RATE, new TournamentSelection(TOURNAMENT_ARITY)) {
@@ -63,7 +73,8 @@ public class GaImpl {
                 while (!condition.isSatisfied(current)) {
                     current = nextGeneration(current);
                     if (progress++ % 50 == 0) {
-                        System.out.println(current.getFittestChromosome());
+                        int inTop20 = knownInTop20(((BuyCountChromosome) current.getFittestChromosome()).itemCounter);
+                        System.out.println(progress + " => " + inTop20 + ", " + current.getFittestChromosome());
                     }
                 }
                 return current;
@@ -212,7 +223,7 @@ public class GaImpl {
             } else {
                 value -= delta;
                 if (value < 0) {
-                    value = Math.abs(value);
+                    value = 0;
                 }
             }
             newList.set(index, value);

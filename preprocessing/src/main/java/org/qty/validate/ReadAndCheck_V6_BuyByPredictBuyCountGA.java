@@ -2,6 +2,7 @@ package org.qty.validate;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -68,11 +69,19 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         System.out.println("[data from order model] predict pid count: " + orderPids.size());
         System.out.println("real buy count: " + count.size());
 
+        if (showResult(count, count.size()) != 16) {
+            System.err.println("ERR");
+            System.err.println("ERR");
+            System.err.println("ERR");
+            System.err.println("ERR");
+            System.err.println("ERR");
+            System.exit(0);
+        }
+
         // 取 order predict pids、product predict pids 與 price pids 的交集 
         Set<String> intersection = Sets.intersection(buyManager.pidCount.keySet(), orderPids);
         Map<String, Integer> priceSubset = NetworkPriceFetcher.buildPriceSet(intersection);
         intersection = Sets.intersection(intersection, priceSubset.keySet());
-
         System.out.println("[ga] intersection size: " + intersection.size());
 
         GaImpl gg = new GaImpl(priceSubset, TestAnswer.ANSWER_PIDS, buyManager.pidWeight);
@@ -81,6 +90,15 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         showResult(chromosome.itemCounter, 20);
         showResult(chromosome.itemCounter, 200);
         showResult(chromosome.itemCounter, intersection.size());
+
+        Writer out = FileManager.fileAsWriter(outputFile);
+        int rankNumber = 1;
+        for (Entry<String, AtomicInteger> e : chromosome.itemCounter.getTopN(20)) {
+            //            out.write(e.getKey() + "," + e.getValue().intValue() + "\n");
+            out.write(String.format("%02d,%s\n", rankNumber, e.getKey()));
+            rankNumber++;
+        }
+
         NetworkPriceFetcher.savePriceState();
     }
 
@@ -94,12 +112,14 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         count.count(pid, price);
     }
 
-    protected static void showResult(ItemCounter<String> count, int topN) {
+    protected static int showResult(ItemCounter<String> count, int topN) {
         Set<String> predict = Sets.newHashSet();
         for (Entry<String, AtomicInteger> item : count.getTopN(topN)) {
             predict.add(item.getKey());
         }
-        System.out.println("top" + topN + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
+        int inTop = Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
+        System.out.println("top" + topN + " => " + inTop);
+        return inTop;
     }
 
     static class UserItemSet {
