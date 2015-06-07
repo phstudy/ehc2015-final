@@ -212,7 +212,7 @@ public class GaImpl {
             } else {
                 value -= delta;
                 if (value < 0) {
-                    value = 0;
+                    value = Math.abs(value);
                 }
             }
             newList.set(index, value);
