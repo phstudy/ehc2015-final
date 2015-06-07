@@ -42,6 +42,11 @@ public class NetworkPriceFetcher {
     }
 
     protected static File cachePath() {
+        File cacheInWorkingDir = new File(priceCached);
+        if(cacheInWorkingDir.exists()){
+            System.out.println("using price-cache: " + cacheInWorkingDir);
+            return cacheInWorkingDir;
+        }
         return new File(System.getProperty("user.home"), priceCached);
     }
 

@@ -1,3 +1,4 @@
-target_dir=$(basename $(pwd))
-echo "sync to ./$target_dir/"
-rsync -e ssh -av --exclude=upload.sh ./ em2:./$target_dir/
+gradle dist
+rm -rf Team34
+unzip Team34.zip
+rsync -e ssh -av --exclude=upload.sh ./Team34/ em2:./Team34
