@@ -35,9 +35,9 @@ public class GaImpl {
     static Random random = new Random();
 
     // parameters for the GA
-    private static final int POPULATION_SIZE = 25;
-    private static final int NUM_GENERATIONS = 10000;
-    private static final double ELITISM_RATE = 0.2;
+    private static final int POPULATION_SIZE = 50;
+    private static final int NUM_GENERATIONS = 20000;
+    private static final double ELITISM_RATE = 0.25;
     private static final double CROSSOVER_RATE = 1;
     private static final double MUTATION_RATE = 0.5;
     private static final int TOURNAMENT_ARITY = 5;
@@ -145,8 +145,22 @@ public class GaImpl {
                 rep[i] = repList.get(i);
             }
 
+            int errorHit = (20 - knownInTop20()) * 10000;
+
             int maxValue = repList.size() * repList.size();
-            return maxValue - getCostWithoutExecption(rep);
+            return maxValue - getCostWithoutExecption(rep) - errorHit;
+        }
+
+        public int knownInTop20() {
+            if (itemCounter == null || itemCounter.size() < 20) {
+                return 0;
+            }
+            Set<String> predict = Sets.newHashSet();
+            for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
+                predict.add(item.getKey());
+            }
+            //        System.out.println("top" + 20 + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
+            return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
         }
 
         @Override
