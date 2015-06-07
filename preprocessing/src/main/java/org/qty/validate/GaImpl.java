@@ -37,9 +37,9 @@ public class GaImpl {
     // parameters for the GA
     private static final int POPULATION_SIZE = 50;
     private static final int NUM_GENERATIONS = 20000;
-    private static final double ELITISM_RATE = 0.25;
+    private static final double ELITISM_RATE = 0.2;
     private static final double CROSSOVER_RATE = 1;
-    private static final double MUTATION_RATE = 0.5;
+    private static final double MUTATION_RATE = 0.2;
     private static final int TOURNAMENT_ARITY = 5;
 
     static Map<String, Integer> priceMap;
@@ -145,27 +145,30 @@ public class GaImpl {
                 rep[i] = repList.get(i);
             }
 
-            int errorHit = (20 - knownInTop20()) * 10000;
-
             int maxValue = repList.size() * repList.size();
-            return maxValue - getCostWithoutExecption(rep) - errorHit;
+            int fitness = maxValue - getCostWithoutExecption(rep);
+
+            if (itemCounter != null) {
+                int inTop20 = knownInTop20(itemCounter);
+                if (inTop20 >= 16) {
+                    fitness += 100;
+                }
+            }
+            return fitness;
         }
 
-        public int knownInTop20() {
-            if (itemCounter == null || itemCounter.size() < 20) {
-                return 0;
-            }
+        @Override
+        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> representation) {
+            return new BuyCountChromosome(representation);
+        }
+
+        private int knownInTop20(ItemCounter<String> itemCounter) {
             Set<String> predict = Sets.newHashSet();
             for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
                 predict.add(item.getKey());
             }
             //        System.out.println("top" + 20 + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
             return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
-        }
-
-        @Override
-        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> representation) {
-            return new BuyCountChromosome(representation);
         }
 
         protected int getCostWithoutExecption(int[] buyCounts) {

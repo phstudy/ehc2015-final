@@ -96,6 +96,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         for (Entry<String, AtomicInteger> e : chromosome.itemCounter.getTopN(20)) {
             //            out.write(e.getKey() + "," + e.getValue().intValue() + "\n");
             out.write(String.format("%02d,%s\n", rankNumber, e.getKey()));
+            System.out.println(String.format("%02d,%s,%s", rankNumber, e.getKey(), e.getValue()));
             rankNumber++;
         }
 
