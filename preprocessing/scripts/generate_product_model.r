@@ -29,7 +29,7 @@ train <- data.frame(train, row.names = "pid")
 # buyCount 至少要是 1 才預測
 train <- subset(train, buyCount>=1)
 
-install.packages("e1071")
+if("e1071" %in% rownames(installed.packages()) == FALSE) {install.packages("e1071")}
 library(e1071)
 
 # 25m

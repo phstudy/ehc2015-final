@@ -28,7 +28,7 @@ train$max_cat <- factor(train$max_cat, levels = c("0","1","A","B","C","D","E","F
 train$buy <- factor(train$buy, levels=c("1", "0"))
 
 # 引用 randomForest library
-install.packages('randomForest')
+if("randomForest" %in% rownames(installed.packages()) == FALSE) {install.packages("randomForest")}
 library(randomForest)
 
 model <- randomForest(train$buy ~ viewcount + uniq_viewcount + cat_0 + cat_1 + cat_A + cat_B + cat_C + cat_D + cat_E + cat_F + cat_G + cat_H + cat_I + cat_J + cat_K + cat_L + cat_O + cat_V + max_cat, data=train, importance=TRUE, ntree=30)

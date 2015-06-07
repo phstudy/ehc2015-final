@@ -5,6 +5,11 @@ hadoop fs -mkdir hdfs://master/tmp/Team34
 hadoop fs -put EHC/EHC_2nd_round_train.log hdfs://master/tmp/Team34/EHC_2nd_round_train.log
 hadoop fs -put EHC/EHC_2nd_round_test.log hdfs://master/tmp/Team34/EHC_2nd_round_test.log
 
+# install randomForest and e1071
+RCMD INSTALL `pwd`/r_packages/randomForest_4.6-10.tar.gz
+RCMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
+
+
 # 比賽時會在解開的目錄內執行
 workspace=`pwd`/EHC/
 export JAVA_OPTS="-Dfile.encoding=utf-8 -DEHC_FINAL_DATASET_DIR=$workspace"
