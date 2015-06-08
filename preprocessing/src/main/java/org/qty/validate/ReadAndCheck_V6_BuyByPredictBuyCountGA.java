@@ -84,8 +84,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         intersection = Sets.intersection(intersection, priceSubset.keySet());
         System.out.println("[ga] intersection size: " + intersection.size());
 
-        GaImpl gg = new GaImpl(priceSubset, TestAnswer.ANSWER_PIDS, buyManager.pidWeight);
-        BuyCountChromosome chromosome = gg.evolve();
+        BuyCountChromosome chromosome = runGA(buyManager, priceSubset);
 
         showResult(chromosome.itemCounter, 20);
         showResult(chromosome.itemCounter, 200);
@@ -101,6 +100,23 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         }
 
         NetworkPriceFetcher.savePriceState();
+    }
+
+    protected static BuyCountChromosome runGA(ProductBuyManager buyManager, Map<String, Integer> priceSubset) {
+        GaImpl gg = new GaImpl(priceSubset, TestAnswer.ANSWER_PIDS, buyManager.pidWeight);
+        while (true) {
+            try {
+                return gg.evolve();
+            } catch (Exception e) {
+                e.printStackTrace();
+                try {
+                    Thread.sleep(1000 * 5);
+                } catch (InterruptedException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        }
     }
 
     protected static void buy(ItemCounter<String> count, String pid) throws FileNotFoundException, IOException {

@@ -32,14 +32,16 @@ import com.google.common.collect.Sets;
 
 public class GaImpl {
 
+    private static final int MAGIC = 16;
+    public static final int MAX_AMOUNT = 10000 * 100 * 4;
     static Random random = new Random();
 
     // parameters for the GA
     private static final int POPULATION_SIZE = 50;
-    private static final int NUM_GENERATIONS = 50000;
-    private static final double ELITISM_RATE = 0.2;
+    private static final int NUM_GENERATIONS = 100000;
+    private static final double ELITISM_RATE = 0.8;
     private static final double CROSSOVER_RATE = 1;
-    private static final double MUTATION_RATE = 0.2;
+    private static final double MUTATION_RATE = 0.5;
     private static final int TOURNAMENT_ARITY = 5;
 
     static Map<String, Integer> priceMap;
@@ -56,11 +58,21 @@ public class GaImpl {
 
     private int knownInTop20(ItemCounter<String> itemCounter) {
         Set<String> predict = Sets.newHashSet();
-        for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
+        List<Entry<String, AtomicInteger>> list = itemCounter.getTopN(20);
+        for (Entry<String, AtomicInteger> item : list) {
             predict.add(item.getKey());
         }
         //        System.out.println("top" + 20 + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
-        return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
+
+        Entry<String, AtomicInteger> itemIn20th = list.get(19);
+        int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
+
+        int itemInTop20 = Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
+        if (itemInTop20 == MAGIC && item20amount < 40 * 10000) {
+            // 未滿 40 萬，故意不滿足
+            return item20amount - 1;
+        }
+        return itemInTop20;
     }
 
     public BuyCountChromosome evolve() {
@@ -75,8 +87,12 @@ public class GaImpl {
                     if (progress++ % 50 == 0) {
                         int inTop20 = knownInTop20(((BuyCountChromosome) current.getFittestChromosome()).itemCounter);
                         System.out.println(progress + " => " + inTop20 + ", " + current.getFittestChromosome());
-                        if (inTop20 == 16) {
+                        if (inTop20 == MAGIC) {
+                            System.err.println("early break");
                             break;
+                        }
+                        if (current.getFittestChromosome().getFitness() < 1) {
+                            throw new IllegalStateException("give up: " + current.getFittestChromosome().getFitness());
                         }
                     }
                 }
@@ -151,13 +167,41 @@ public class GaImpl {
             int maxValue = repList.size() * repList.size();
             int fitness = maxValue - getCostWithoutExecption(rep);
 
-            if (itemCounter != null) {
-                int inTop20 = knownInTop20(itemCounter);
-                if (inTop20 >= 16) {
-                    fitness += 100;
+            int bouns = 0;
+            for (int i = 0; i < repList.size() - 1; i++) {
+                int v1 = repList.get(i);
+                int v2 = repList.get(i + 1);
+
+                String k1 = keyOrders.get(i);
+                String k2 = keyOrders.get(i + 1);
+                if (pidWeight.get(k1) > pidWeight.get(k2) && v1 > v2) {
+                    bouns++;
                 }
             }
-            return fitness;
+
+            if (itemCounter != null) {
+                int inTop20 = knownInTop20(itemCounter);
+                if (inTop20 >= MAGIC) {
+                    fitness += 100;
+                }
+
+                List<Entry<String, AtomicInteger>> top20List = itemCounter.getTopN(20);
+                Entry<String, AtomicInteger> itemIn1st = top20List.get(1);
+                Entry<String, AtomicInteger> itemIn20th = top20List.get(19);
+
+                int item1amount = itemIn1st.getValue().intValue() * priceMap.get(itemIn1st.getKey());
+                int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
+                // top1 超過 400 萬就丟棄
+                if (item1amount > MAX_AMOUNT) {
+                    return 0;
+                }
+
+                final int meet20th = 45 * 10000;
+                int item20Dist = Math.abs(item20amount - meet20th);
+                fitness += (meet20th - item20Dist);
+            }
+
+            return bouns + fitness;
         }
 
         @Override
@@ -170,7 +214,6 @@ public class GaImpl {
             for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
                 predict.add(item.getKey());
             }
-            //        System.out.println("top" + 20 + " => " + Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size());
             return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
         }
 
@@ -243,24 +286,18 @@ public class GaImpl {
             } else {
                 value -= delta;
                 if (value < 0) {
-                    value = 0;
+                    value = Math.abs(value);
                 }
             }
+
+            if (f.itemCounter != null) {
+                List<Entry<String, AtomicInteger>> item = f.itemCounter.getTopN(1);
+                if (item.get(0).getValue().intValue() * priceMap.get(item.get(0).getKey()) > MAX_AMOUNT) {
+                    item.get(0).getValue().set(1);
+                }
+            }
+
             newList.set(index, value);
-
-            //
-            if (index < newList.size() - 1) {
-                // 透過 pid-weight 簡易比對，保持與 model 的一致
-                int nextValue = newList.get(index + 1);
-                String k1 = keyOrders.get(index);
-                String k2 = keyOrders.get(index + 1);
-                boolean consistence = pidWeight.get(k1) > pidWeight.get(k2) && value > nextValue;
-                if (!consistence) {
-                    newList.set(index, nextValue);
-                    newList.set(index + 1, value);
-                }
-            }
-
             return f.newFixedLengthChromosome(newList);
         }
     }
