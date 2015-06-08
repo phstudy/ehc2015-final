@@ -78,15 +78,32 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
             System.exit(0);
         }
 
+        int bound = 100;
+        while (true) {
+            if (showResult(count, bound) == 16) {
+                break;
+            }
+            bound += 50;
+        }
+
+        Set<String> smallList = new HashSet<String>();
+        for (Entry<String, AtomicInteger> e : count.getTopN(bound)) {
+            smallList.add(e.getKey());
+        }
+
         // 取 order predict pids、product predict pids 與 price pids 的交集 
         Set<String> intersection = Sets.intersection(buyManager.pidCount.keySet(), orderPids);
+        intersection = Sets.intersection(intersection, smallList);
+
         Map<String, Integer> priceSubset = NetworkPriceFetcher.buildPriceSet(intersection);
         intersection = Sets.intersection(intersection, priceSubset.keySet());
         System.out.println("[ga] intersection size: " + intersection.size());
+        System.out.println("[ga] price size: " + priceSubset.size());
 
         BuyCountChromosome chromosome = runGA(buyManager, priceSubset);
 
         showResult(chromosome.itemCounter, 20);
+        showResult(chromosome.itemCounter, 35);
         showResult(chromosome.itemCounter, 50);
         showResult(chromosome.itemCounter, 100);
         showResult(chromosome.itemCounter, 200);

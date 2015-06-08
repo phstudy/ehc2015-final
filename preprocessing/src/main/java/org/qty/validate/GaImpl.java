@@ -33,15 +33,15 @@ import com.google.common.collect.Sets;
 public class GaImpl {
 
     private static final int MAGIC = 16;
-    public static final int MAX_AMOUNT = 10000 * 100 * 4;
+    //    public static final int MAX_AMOUNT = 10000 * 100 * 4;
     static Random random = new Random();
 
     // parameters for the GA
-    private static final int POPULATION_SIZE = 50;
-    private static final int NUM_GENERATIONS = 200000;
-    private static final double ELITISM_RATE = 0.5;
+    private static final int POPULATION_SIZE = 100;
+    private static final int NUM_GENERATIONS = 20000;
+    private static final double ELITISM_RATE = 0.2;
     private static final double CROSSOVER_RATE = 1;
-    private static final double MUTATION_RATE = 0.5;
+    private static final double MUTATION_RATE = 0.2;
     private static final int TOURNAMENT_ARITY = 5;
 
     static Map<String, Integer> priceMap;
@@ -176,30 +176,10 @@ public class GaImpl {
                 String k2 = keyOrders.get(i + 1);
                 if (pidWeight.get(k1) > pidWeight.get(k2) && v1 > v2) {
                     bouns++;
+                } else if (pidWeight.get(k1) == pidWeight.get(k2) && v1 == v2) {
+                    bouns += 2;
                 }
             }
-
-//            if (itemCounter != null) {
-//                int inTop20 = knownInTop20(itemCounter);
-//                if (inTop20 >= MAGIC) {
-//                    fitness += 100;
-//                }
-//
-//                List<Entry<String, AtomicInteger>> top20List = itemCounter.getTopN(20);
-//                Entry<String, AtomicInteger> itemIn1st = top20List.get(1);
-//                Entry<String, AtomicInteger> itemIn20th = top20List.get(19);
-//
-//                int item1amount = itemIn1st.getValue().intValue() * priceMap.get(itemIn1st.getKey());
-//                int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
-//                // top1 超過 400 萬就丟棄
-//                if (item1amount > MAX_AMOUNT) {
-//                    return 0;
-//                }
-//
-//                final int meet20th = 45 * 10000;
-//                int item20Dist = Math.abs(item20amount - meet20th);
-//                fitness += (meet20th - item20Dist);
-//            }
 
             return bouns + fitness;
         }
@@ -207,14 +187,6 @@ public class GaImpl {
         @Override
         public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> representation) {
             return new BuyCountChromosome(representation);
-        }
-
-        private int knownInTop20(ItemCounter<String> itemCounter) {
-            Set<String> predict = Sets.newHashSet();
-            for (Entry<String, AtomicInteger> item : itemCounter.getTopN(20)) {
-                predict.add(item.getKey());
-            }
-            return Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
         }
 
         protected int getCostWithoutExecption(int[] buyCounts) {
@@ -290,12 +262,12 @@ public class GaImpl {
                 }
             }
 
-            if (f.itemCounter != null) {
-                List<Entry<String, AtomicInteger>> item = f.itemCounter.getTopN(1);
-                if (item.get(0).getValue().intValue() * priceMap.get(item.get(0).getKey()) > MAX_AMOUNT) {
-                    item.get(0).getValue().set(1);
-                }
-            }
+            //            if (f.itemCounter != null) {
+            //                List<Entry<String, AtomicInteger>> item = f.itemCounter.getTopN(1);
+            //                if (item.get(0).getValue().intValue() * priceMap.get(item.get(0).getKey()) > MAX_AMOUNT) {
+            //                    item.get(0).getValue().set(1);
+            //                }
+            //            }
 
             newList.set(index, value);
             return f.newFixedLengthChromosome(newList);
