@@ -38,8 +38,8 @@ public class GaImpl {
 
     // parameters for the GA
     private static final int POPULATION_SIZE = 50;
-    private static final int NUM_GENERATIONS = 100000;
-    private static final double ELITISM_RATE = 0.8;
+    private static final int NUM_GENERATIONS = 200000;
+    private static final double ELITISM_RATE = 0.5;
     private static final double CROSSOVER_RATE = 1;
     private static final double MUTATION_RATE = 0.5;
     private static final int TOURNAMENT_ARITY = 5;
@@ -179,27 +179,27 @@ public class GaImpl {
                 }
             }
 
-            if (itemCounter != null) {
-                int inTop20 = knownInTop20(itemCounter);
-                if (inTop20 >= MAGIC) {
-                    fitness += 100;
-                }
-
-                List<Entry<String, AtomicInteger>> top20List = itemCounter.getTopN(20);
-                Entry<String, AtomicInteger> itemIn1st = top20List.get(1);
-                Entry<String, AtomicInteger> itemIn20th = top20List.get(19);
-
-                int item1amount = itemIn1st.getValue().intValue() * priceMap.get(itemIn1st.getKey());
-                int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
-                // top1 超過 400 萬就丟棄
-                if (item1amount > MAX_AMOUNT) {
-                    return 0;
-                }
-
-                final int meet20th = 45 * 10000;
-                int item20Dist = Math.abs(item20amount - meet20th);
-                fitness += (meet20th - item20Dist);
-            }
+//            if (itemCounter != null) {
+//                int inTop20 = knownInTop20(itemCounter);
+//                if (inTop20 >= MAGIC) {
+//                    fitness += 100;
+//                }
+//
+//                List<Entry<String, AtomicInteger>> top20List = itemCounter.getTopN(20);
+//                Entry<String, AtomicInteger> itemIn1st = top20List.get(1);
+//                Entry<String, AtomicInteger> itemIn20th = top20List.get(19);
+//
+//                int item1amount = itemIn1st.getValue().intValue() * priceMap.get(itemIn1st.getKey());
+//                int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
+//                // top1 超過 400 萬就丟棄
+//                if (item1amount > MAX_AMOUNT) {
+//                    return 0;
+//                }
+//
+//                final int meet20th = 45 * 10000;
+//                int item20Dist = Math.abs(item20amount - meet20th);
+//                fitness += (meet20th - item20Dist);
+//            }
 
             return bouns + fitness;
         }

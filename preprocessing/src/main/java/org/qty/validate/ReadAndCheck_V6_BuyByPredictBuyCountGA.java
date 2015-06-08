@@ -87,6 +87,8 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         BuyCountChromosome chromosome = runGA(buyManager, priceSubset);
 
         showResult(chromosome.itemCounter, 20);
+        showResult(chromosome.itemCounter, 50);
+        showResult(chromosome.itemCounter, 100);
         showResult(chromosome.itemCounter, 200);
         showResult(chromosome.itemCounter, intersection.size());
 
