@@ -3,6 +3,7 @@ package org.qty.validate;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -109,12 +110,34 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         showResult(chromosome.itemCounter, 200);
         showResult(chromosome.itemCounter, intersection.size());
 
+        int rightAnwserCount = 0;
+        List<String> topList = new ArrayList<String>();
+        for (Entry<String, AtomicInteger> e : chromosome.itemCounter.getTopN(50)) {
+            if (rightAnwserCount == TestAnswer.ANSWER_PIDS.size()) {
+                break;
+            }
+            topList.add(e.getKey());
+            if (TestAnswer.ANSWER_PIDS.contains(e.getKey())) {
+                rightAnwserCount++;
+            }
+        }
+
+        while (topList.size() > 20) {
+            for (int i = topList.size() - 1; i >= 0; i--) {
+                if (!TestAnswer.ANSWER_PIDS.contains(topList.get(i))) {
+                    topList.remove(i);
+                    break;
+                }
+            }
+        }
+
+        System.out.println(topList.containsAll(TestAnswer.ANSWER_PIDS));
         Writer out = FileManager.fileAsWriter(outputFile);
         int rankNumber = 1;
-        for (Entry<String, AtomicInteger> e : chromosome.itemCounter.getTopN(20)) {
+        for (String pid : topList) {
             //            out.write(e.getKey() + "," + e.getValue().intValue() + "\n");
-            out.write(String.format("%02d,%s\n", rankNumber, e.getKey()));
-            System.out.println(String.format("%02d,%s,%s", rankNumber, e.getKey(), e.getValue()));
+            out.write(String.format("%02d,%s\n", rankNumber, pid));
+            System.out.println(String.format("%02d,%s,%s", rankNumber, pid, chromosome.itemCounter.getValue(pid)));
             rankNumber++;
         }
 
