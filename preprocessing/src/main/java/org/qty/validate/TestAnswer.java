@@ -11,7 +11,8 @@ import com.google.common.collect.Sets;
 
 public class TestAnswer {
 
-    static Set<String> ANSWER_PIDS = Sets.newHashSet();;
+    public static int size;
+    public static Set<String> ANSWER_PIDS = Sets.newHashSet();
 
     static {
 
@@ -20,6 +21,7 @@ public class TestAnswer {
             while (it.hasNext()) {
                 ANSWER_PIDS.add(StringUtils.split(it.next(), ",")[0]);
             }
+            size = ANSWER_PIDS.size();
         } catch (IOException e) {
             e.printStackTrace();
         }

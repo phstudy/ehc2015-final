@@ -32,7 +32,6 @@ import com.google.common.collect.Sets;
 
 public class GaImpl {
 
-    private static final int MAGIC = 16;
     //    public static final int MAX_AMOUNT = 10000 * 100 * 4;
     static Random random = new Random();
 
@@ -68,7 +67,7 @@ public class GaImpl {
         int item20amount = itemIn20th.getValue().intValue() * priceMap.get(itemIn20th.getKey());
 
         int itemInTop20 = Sets.intersection(predict, TestAnswer.ANSWER_PIDS).size();
-        if (itemInTop20 == MAGIC && item20amount < 40 * 10000) {
+        if (itemInTop20 == TestAnswer.size && item20amount < 40 * 10000) {
             // 未滿 40 萬，故意不滿足
             return item20amount - 1;
         }
@@ -87,7 +86,7 @@ public class GaImpl {
                     if (progress++ % 50 == 0) {
                         int inTop20 = knownInTop20(((BuyCountChromosome) current.getFittestChromosome()).itemCounter);
                         System.out.println(progress + " => " + inTop20 + ", " + current.getFittestChromosome());
-                        if (inTop20 == MAGIC) {
+                        if (inTop20 == TestAnswer.size) {
                             System.err.println("early break");
                             break;
                         }

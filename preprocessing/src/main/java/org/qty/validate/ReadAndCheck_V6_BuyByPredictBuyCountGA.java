@@ -70,7 +70,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         System.out.println("[data from order model] predict pid count: " + orderPids.size());
         System.out.println("real buy count: " + count.size());
 
-        if (showResult(count, count.size()) != 16) {
+        if (showResult(count, count.size()) != TestAnswer.size) {
             System.err.println("ERR");
             System.err.println("ERR");
             System.err.println("ERR");
@@ -81,7 +81,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
 
         int bound = 100;
         while (true) {
-            if (showResult(count, bound) == 16) {
+            if (showResult(count, bound) == TestAnswer.size) {
                 break;
             }
             bound += 50;
