@@ -12,7 +12,7 @@ RCMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
 
 # 比賽時會在解開的目錄內執行
 workspace=`pwd`/EHC/
-export JAVA_OPTS="-Dfile.encoding=utf-8 -DEHC_FINAL_DATASET_DIR=$workspace"
+export JAVA_OPTS="-Xmx5g -Dfile.encoding=utf-8 -DEHC_FINAL_DATASET_DIR=$workspace"
 CMD=bin/preprocessing
 
 $CMD user EHC_2nd_round_train.log userdata_train.csv
