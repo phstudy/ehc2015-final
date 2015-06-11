@@ -2,14 +2,15 @@ package org.qty.mr;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class ProductPreprocessingReducer extends Reducer<Text, ProductSession, Text, Text> {
+public class ProductPreprocessingReducer extends Reducer<Text, ProductSession, NullWritable, Text> {
 
     @Override
     protected void reduce(Text key, Iterable<ProductSession> values,
-            Reducer<Text, ProductSession, Text, Text>.Context context) throws IOException, InterruptedException {
+            Reducer<Text, ProductSession, NullWritable, Text>.Context context) throws IOException, InterruptedException {
 
         String cat = "NA";
         ProductSession bigSession = null;
@@ -35,7 +36,7 @@ public class ProductPreprocessingReducer extends Reducer<Text, ProductSession, T
         }
 
         bigSession.setCategory(cat);
-        context.write(key, new Text(bigSession.toString()));
+        context.write(NullWritable.get(), new Text(bigSession.toString()));
         bigSession.invalidate();
     }
 }

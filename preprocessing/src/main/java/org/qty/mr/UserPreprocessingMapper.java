@@ -38,7 +38,7 @@ public class UserPreprocessingMapper extends Mapper<LongWritable, Text, Text, Us
             session.viewProduct(cat, pid);
         }
 
-        context.write(new Text(session.toGroupKey()), session);
+        context.write(new Text(eruid), session);
     }
 
     protected LogType getLogType(String log) {
