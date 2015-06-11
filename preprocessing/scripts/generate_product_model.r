@@ -24,6 +24,7 @@ print(getwd())
 
 # 把資料讀進來
 train <- read.csv(inputfile, colClasses=c("pid"="factor"))
+names(train) <- c("pid","view","viewBySession","price","cat","buyCount")
 train <- data.frame(train, row.names = "pid")
 
 # buyCount 至少要是 1 才預測

@@ -1,32 +1,35 @@
 #!/bin/env bash
 
-tar zxvf /data/EHC_Final.tar.gz
-hadoop fs -mkdir hdfs://master/tmp/Team34
-hadoop fs -put EHC/EHC_2nd_round_train.log hdfs://master/tmp/Team34/EHC_2nd_round_train.log
-hadoop fs -put EHC/EHC_2nd_round_test.log hdfs://master/tmp/Team34/EHC_2nd_round_test.log
-
-# install randomForest and e1071
-R CMD INSTALL `pwd`/r_packages/randomForest_4.6-10.tar.gz
-R CMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
-
-
 # 比賽時會在解開的目錄內執行
 workspace=`pwd`/EHC/
 export JAVA_OPTS="-Xmx5g -Dfile.encoding=utf-8 -DEHC_FINAL_DATASET_DIR=$workspace"
 CMD=bin/preprocessing
 JAR=./lib/preprocessing-1.0-SNAPSHOT.jar
+#TEAM=Team34
+TEAM=Team0
 
-hadoop jar $JAR user /tmp/Team34/EHC_2nd_round_train.log /tmp/Team34/user_train
-hadoop jar $JAR user /tmp/Team34/EHC_2nd_round_test.log /tmp/Team34/user_test
-hadoop jar $JAR product /tmp/Team34/EHC_2nd_round_train.log /tmp/Team34/product_train
-hadoop jar $JAR product /tmp/Team34/EHC_2nd_round_test.log /tmp/Team34/product_test
+rm -rf EHC
+hadoop fs -rm -r -skipTrash hdfs://master/tmp/$TEAM
 
-hadoop fs -getmerge /tmp/Team34/product_train EHC/product_train.csv
-hadoop fs -getmerge /tmp/Team34/product_test EHC/product_test.csv
-hadoop fs -getmerge /tmp/Team34/user_train EHC/userdata_train.csv
-hadoop fs -getmerge /tmp/Team34/user_test EHC/userdata_test.csv
+tar zxvf /data/EHC_Final.tar.gz
+hadoop fs -mkdir hdfs://master/tmp/$TEAM
+hadoop fs -put EHC/EHC_2nd_round_train.log hdfs://master/tmp/$TEAM/EHC_2nd_round_train.log
+hadoop fs -put EHC/EHC_2nd_round_test.log hdfs://master/tmp/$TEAM/EHC_2nd_round_test.log
 
-exit ;
+# install randomForest and e1071
+R CMD INSTALL `pwd`/r_packages/randomForest_4.6-10.tar.gz
+R CMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
+
+hadoop jar $JAR user /tmp/$TEAM/EHC_2nd_round_train.log /tmp/$TEAM/user_train
+hadoop jar $JAR user /tmp/$TEAM/EHC_2nd_round_test.log /tmp/$TEAM/user_test
+hadoop jar $JAR product /tmp/$TEAM/EHC_2nd_round_train.log /tmp/$TEAM/product_train
+hadoop jar $JAR product /tmp/$TEAM/EHC_2nd_round_test.log /tmp/$TEAM/product_test
+
+hadoop fs -getmerge /tmp/$TEAM/product_train EHC/product_train.csv
+hadoop fs -getmerge /tmp/$TEAM/product_test EHC/product_test.csv
+hadoop fs -getmerge /tmp/$TEAM/user_train EHC/userdata_train.csv
+hadoop fs -getmerge /tmp/$TEAM/user_test EHC/userdata_test.csv
+
 #$CMD user EHC_2nd_round_train.log userdata_train.csv
 #$CMD user EHC_2nd_round_test.log userdata_test.csv
 #$CMD product EHC_2nd_round_train.log product_train.csv
@@ -36,4 +39,4 @@ Rscript generate_user_model.r $workspace userdata_train.csv userdata_test.csv us
 Rscript generate_product_model.r $workspace product_train.csv product_test.csv product_predict.csv
 $CMD result6 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 7 result.txt 
 
-hadoop fs -put EHC/result.txt hdfs://master/tmp/Team34/Team34_Result.txt
+hadoop fs -put EHC/result.txt hdfs://master/tmp/$TEAM/$TEAM_Result.txt

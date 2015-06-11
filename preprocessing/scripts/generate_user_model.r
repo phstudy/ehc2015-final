@@ -17,6 +17,7 @@ print(getwd())
 
 # 把資料讀進來
 train <- read.csv(inputfile)
+names(train) <- c("eruid","viewcount","uniq_viewcount","cat_0","cat_1","cat_A","cat_B","cat_C","cat_D","cat_E","cat_F","cat_G","cat_H","cat_I","cat_J","cat_K","cat_L","cat_O","cat_V","max_cat","buyCount","buy")
 
 # 轉成 data frame 並指定 eruid 為 row id
 train <- data.frame(train, row.names = "eruid")
