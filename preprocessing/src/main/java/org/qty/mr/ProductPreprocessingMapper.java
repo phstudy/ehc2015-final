@@ -3,11 +3,10 @@ package org.qty.mr;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.qty.validate.NetworkPriceFetcher;
 import org.qty.validate.ValidationUtils;
 
 import com.google.common.base.Optional;

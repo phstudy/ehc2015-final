@@ -1,7 +1,5 @@
 package org.qty.validate;
 
-import static org.qty.QLabInitConfig.NO_PID;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -9,16 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.StringUtils;
-import org.qty.Answer;
 import org.qty.ItemCounter;
 import org.qty.QLabInitConfig;
 import org.qty.file.FileManager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 

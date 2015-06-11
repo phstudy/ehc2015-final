@@ -1,7 +1,7 @@
 package org.qty;
 
-import static org.qty.QLabInitConfig.NO_PID;
 import static org.qty.QLabInitConfig.INPUT_FILE;
+import static org.qty.QLabInitConfig.NO_PID;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,17 +17,15 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.phstudy.ehc.utils.PriceUtils;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.qty.file.FileManager;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-
-import org.qty.file.FileManager;
 
 public class ClickHistory2_Price {
 
