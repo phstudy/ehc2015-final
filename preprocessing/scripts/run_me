@@ -6,19 +6,31 @@ hadoop fs -put EHC/EHC_2nd_round_train.log hdfs://master/tmp/Team34/EHC_2nd_roun
 hadoop fs -put EHC/EHC_2nd_round_test.log hdfs://master/tmp/Team34/EHC_2nd_round_test.log
 
 # install randomForest and e1071
-RCMD INSTALL `pwd`/r_packages/randomForest_4.6-10.tar.gz
-RCMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
+R CMD INSTALL `pwd`/r_packages/randomForest_4.6-10.tar.gz
+R CMD INSTALL `pwd`/r_packages/e1071_1.6-4.tar.gz
 
 
 # 比賽時會在解開的目錄內執行
 workspace=`pwd`/EHC/
 export JAVA_OPTS="-Xmx5g -Dfile.encoding=utf-8 -DEHC_FINAL_DATASET_DIR=$workspace"
 CMD=bin/preprocessing
+JAR=./lib/preprocessing-1.0-SNAPSHOT.jar
 
-$CMD user EHC_2nd_round_train.log userdata_train.csv
-$CMD user EHC_2nd_round_test.log userdata_test.csv
-$CMD product EHC_2nd_round_train.log product_train.csv
-$CMD product EHC_2nd_round_test.log product_test.csv
+hadoop jar $JAR user /tmp/Team34/EHC_2nd_round_train.log /tmp/Team34/user_train
+hadoop jar $JAR user /tmp/Team34/EHC_2nd_round_test.log /tmp/Team34/user_test
+hadoop jar $JAR product /tmp/Team34/EHC_2nd_round_train.log /tmp/Team34/product_train
+hadoop jar $JAR product /tmp/Team34/EHC_2nd_round_test.log /tmp/Team34/product_test
+
+hadoop fs -getmerge /tmp/Team34/product_train EHC/product_train.csv
+hadoop fs -getmerge /tmp/Team34/product_test EHC/product_test.csv
+hadoop fs -getmerge /tmp/Team34/user_train EHC/userdata_train.csv
+hadoop fs -getmerge /tmp/Team34/user_test EHC/userdata_test.csv
+
+exit ;
+#$CMD user EHC_2nd_round_train.log userdata_train.csv
+#$CMD user EHC_2nd_round_test.log userdata_test.csv
+#$CMD product EHC_2nd_round_train.log product_train.csv
+#$CMD product EHC_2nd_round_test.log product_test.csv
 
 Rscript generate_user_model.r $workspace userdata_train.csv userdata_test.csv userdata_predict.csv
 Rscript generate_product_model.r $workspace product_train.csv product_test.csv product_predict.csv
