@@ -6,7 +6,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class PreprocessingReducer extends Reducer<Text, UserSession, Text, Text> {
+public class UserPreprocessingReducer extends Reducer<Text, UserSession, Text, Text> {
 
     @Override
     protected void reduce(Text key, Iterable<UserSession> values, Reducer<Text, UserSession, Text, Text>.Context context)

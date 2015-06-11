@@ -5,13 +5,12 @@ import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.qty.validate.ValidationUtils;
 
 import com.google.common.base.Optional;
 
-public class PreprocessingMapper extends Mapper<LongWritable, Text, Text, UserSession> {
+public class UserPreprocessingMapper extends Mapper<LongWritable, Text, Text, UserSession> {
 
     static enum LogType {
         VIEW, ORDER, DROP

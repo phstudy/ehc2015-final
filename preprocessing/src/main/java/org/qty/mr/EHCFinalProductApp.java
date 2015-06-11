@@ -15,7 +15,7 @@ import org.apache.hadoop.util.Tool;
 
 import com.google.common.base.Stopwatch;
 
-public class EHCFinalApp extends Configured implements Tool {
+public class EHCFinalProductApp extends Configured implements Tool {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
@@ -30,13 +30,12 @@ public class EHCFinalApp extends Configured implements Tool {
         Configuration conf = getConf();
 
         Job job = Job.getInstance(conf, "qty app");
-        job.setJarByClass(EHCFinalApp.class);
-//        job.setCombinerClass(PreprocessingCombiner.class);
-        job.setReducerClass(UserPreprocessingReducer.class);
-        job.setMapperClass(UserPreprocessingMapper.class);
+        job.setJarByClass(EHCFinalProductApp.class);
+        job.setReducerClass(ProductPreprocessingReducer.class);
+        job.setMapperClass(ProductPreprocessingMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(UserSession.class);
+        job.setMapOutputValueClass(ProductSession.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(input));
@@ -48,7 +47,7 @@ public class EHCFinalApp extends Configured implements Tool {
     }
 
     public static void main(String[] args) throws Throwable {
-        EHCFinalApp app = new EHCFinalApp();
+        EHCFinalProductApp app = new EHCFinalProductApp();
         //        app.run(new String[] { "/Users/qrtt1/_ehc_final_data/small.log", "./foooo" });
         app.run(new String[] { "/Users/qrtt1/_ehc_final_data/EHC_2nd_round_train.log", "./foooo" });
 
