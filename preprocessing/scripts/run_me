@@ -24,4 +24,4 @@ Rscript generate_user_model.r $workspace userdata_train.csv userdata_test.csv us
 Rscript generate_product_model.r $workspace product_train.csv product_test.csv product_predict.csv
 $CMD result6 EHC_2nd_round_test.log userdata_predict.csv product_predict.csv 7 result.txt 
 
-hadoop fs -put EHC/result.txt hdfs://master/tmp/Team34/Team34_Result.txt
+cp EHC/result.txt Team34_Result.txt
