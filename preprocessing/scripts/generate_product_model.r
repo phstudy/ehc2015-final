@@ -42,6 +42,7 @@ library(e1071)
 model <- svm(buyCount~., data=train)
 
 test <- read.csv(testfile, colClasses=c("pid"="factor"))
+names(test) <- c("pid","view","viewBySession","price","cat","buyCount")
 test <- data.frame(test, row.names = "pid")
 result <- predict(model, test)
 write.csv(result, file=predict_output)
