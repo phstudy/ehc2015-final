@@ -64,6 +64,10 @@ public class EHCFinalApp extends Configured implements Tool {
     public static void main(String[] args) throws Throwable {
         EHCFinalApp app = new EHCFinalApp();
         app.run(args);
+        //        app.run(new String[] { "product", "/Users/qrtt1/_ehc_final_data/EHC_2nd_round_train.log",
+        //                "tmp/" + System.currentTimeMillis() });
+        //        app.run(new String[] { "user", "/Users/qrtt1/_ehc_final_data/EHC_2nd_round_train.log",
+        //                "tmp/" + System.currentTimeMillis() });
 
     }
 }

@@ -5,12 +5,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Writable;
 
 import com.google.common.base.Joiner;
@@ -20,7 +19,7 @@ public class ProductSession implements Writable {
     String pid;
     int buyCount = 0;
     String cate = "NA";
-    List<String> viewHistory = new ArrayList<String>();
+    Map<String, Integer> viewHistory = new HashMap<String, Integer>();
 
     protected ProductSession() {
     }
@@ -33,7 +32,12 @@ public class ProductSession implements Writable {
         if (StringUtils.isEmpty(eruid)) {
             return;
         }
-        viewHistory.add(eruid);
+        if (!viewHistory.containsKey(eruid)) {
+            viewHistory.put(eruid, 1);
+            return;
+        }
+        int count = viewHistory.get(eruid);
+        viewHistory.put(eruid, count + 1);
     }
 
     public void buy(int num) {
@@ -44,7 +48,9 @@ public class ProductSession implements Writable {
         this.cate = cat;
     }
 
-    public void join(ProductSession other) {
+    static Log logger = LogFactory.getLog(ProductSession.class);
+
+    public synchronized void join(ProductSession other) {
         if (!this.pid.equals(other.pid)) {
             return;
         }
@@ -53,15 +59,28 @@ public class ProductSession implements Writable {
         if ("NA".equals(this.cate) && !"NA".equals(other.cate)) {
             this.cate = other.cate;
         }
-        this.viewHistory.addAll(other.viewHistory);
+
+        for (String eruid : other.viewHistory.keySet()) {
+            if (!this.viewHistory.containsKey(eruid)) {
+                viewHistory.put(eruid, other.viewHistory.get(eruid));
+                continue;
+            }
+            viewHistory.put(eruid, other.viewHistory.get(eruid) + viewHistory.get(eruid));
+        }
+
     }
 
     public String toString() {
         ArrayList<String> list = new ArrayList<String>();
         //pid,view,viewBySession,price,cat,buyCount
+        int allViewed = 0;
+        for (Integer v : viewHistory.values()) {
+            allViewed += v;
+        }
+
         list.add(pid);
+        list.add("" + allViewed);
         list.add("" + viewHistory.size());
-        list.add("" + new HashSet<String>(viewHistory).size());
         list.add("" + ReadOnlyPriceData.lookUp(pid));
         list.add("" + (int) cate.charAt(0));
         list.add("" + buyCount);
@@ -79,8 +98,9 @@ public class ProductSession implements Writable {
         out.writeUTF(cate);
 
         out.writeInt(viewHistory.size());
-        for (String e : viewHistory) {
+        for (String e : viewHistory.keySet()) {
             out.writeUTF(e);
+            out.writeInt(viewHistory.get(e));
         }
 
     }
@@ -92,7 +112,7 @@ public class ProductSession implements Writable {
         cate = in.readUTF();
         int size = in.readInt();
         for (int i = 0; i < size; i++) {
-            viewHistory.add(in.readUTF());
+            viewHistory.put(in.readUTF(), in.readInt());
         }
     }
 

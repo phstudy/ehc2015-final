@@ -15,14 +15,12 @@ public class ProductPreprocessingReducer extends Reducer<Text, ProductSession, N
         String cat = "NA";
         ProductSession bigSession = null;
         for (ProductSession productSession : values) {
-            if (!"NA".equals(productSession.cate)) {
-                cat = productSession.cate;
+            if (bigSession == null) {
+                bigSession = new ProductSession(productSession.pid);
             }
 
-            if (bigSession == null) {
-                bigSession = productSession;
-
-                continue;
+            if (!"NA".equals(productSession.cate)) {
+                cat = productSession.cate;
             }
 
             bigSession.join(productSession);

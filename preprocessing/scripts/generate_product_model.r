@@ -23,7 +23,7 @@ print(getwd())
 #
 
 # 把資料讀進來
-train <- read.csv(inputfile, colClasses=c("pid"="factor"))
+train <- read.csv(inputfile)
 names(train) <- c("pid","view","viewBySession","price","cat","buyCount")
 train <- data.frame(train, row.names = "pid")
 
@@ -41,7 +41,7 @@ library(e1071)
 
 model <- svm(buyCount~., data=train)
 
-test <- read.csv(testfile, colClasses=c("pid"="factor"))
+test <- read.csv(testfile)
 names(test) <- c("pid","view","viewBySession","price","cat","buyCount")
 test <- data.frame(test, row.names = "pid")
 result <- predict(model, test)
