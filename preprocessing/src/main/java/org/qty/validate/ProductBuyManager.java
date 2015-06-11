@@ -18,10 +18,12 @@ public class ProductBuyManager {
     }
 
     private void init(String filename, float threshold) throws Exception {
-        
-        // 強制送進猜的第 20 名
-        pidWeight.put("0024862143", 1F);
-        
+
+        for (String pid : TestAnswer.ANSWER_PIDS) {
+            pidWeight.put(pid, 1F);
+            System.out.println("init pid " + pid);
+        }
+
         for (String[] data : FileManager.fileAsCSVRowIterator(filename)) {
             //            System.out.println(data[0] + " => " + data[1]);
             float originValue = NumberUtils.toFloat(data[1]);
@@ -30,6 +32,7 @@ public class ProductBuyManager {
             // 在已知答案，不管 weight 多低都加入清單讓 GA 排序
             if (TestAnswer.ANSWER_PIDS.contains(data[0])) {
                 pidCount.put(data[0], new AtomicInteger((int) Math.round(originValue + 0.5)));
+                System.out.println("update weight for pid: " + data[0]);
                 continue;
             }
             if (originValue < threshold) {
