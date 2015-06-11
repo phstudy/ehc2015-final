@@ -71,6 +71,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
         System.out.println("real buy count: " + count.size());
 
         if (showResult(count, count.size()) != TestAnswer.size) {
+            System.out.println("required " + TestAnswer.size);
             System.err.println("ERR");
             System.err.println("ERR");
             System.err.println("ERR");
