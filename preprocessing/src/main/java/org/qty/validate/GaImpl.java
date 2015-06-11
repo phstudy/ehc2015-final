@@ -36,7 +36,7 @@ public class GaImpl {
     static Random random = new Random();
 
     // parameters for the GA
-    private static final int POPULATION_SIZE = 50;
+    private static final int POPULATION_SIZE = 75;
     private static final int NUM_GENERATIONS = 10000;
     private static final double ELITISM_RATE = 0.2;
     private static final double CROSSOVER_RATE = 1;
