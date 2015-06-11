@@ -26,7 +26,11 @@ public class ReadOnlyPriceData {
 
     public static Integer lookUp(String pid) {
         if (cachedPrices.containsKey(pid)) {
-            return cachedPrices.get(pid);
+            int v = cachedPrices.get(pid);
+            if (v < 0) {
+                return 0;
+            }
+            return v;
         }
         return 0;
     }
