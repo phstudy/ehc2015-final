@@ -79,7 +79,7 @@ public class ReadAndCheck_V6_BuyByPredictBuyCountGA {
             System.err.println("ERR");
             System.err.println("ERR");
             System.err.println("ERR");
-            System.exit(0);
+//            System.exit(0);
         }
 
         int bound = 100;
