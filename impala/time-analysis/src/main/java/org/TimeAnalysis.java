@@ -243,6 +243,7 @@ public class TimeAnalysis {
                     total += MAX_DURATION_PER_VIEW;
                     userTime += MAX_DURATION_PER_VIEW;
                     times.put(exEruid, userTime);
+                    userTime = 0;
                 }
 
                 exEruid = curEruid;
