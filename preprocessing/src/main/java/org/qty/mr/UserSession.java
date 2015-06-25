@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Writable;
+import org.qty.validate.TrainTop20PidsAnswer;
 
 import com.google.common.base.Joiner;
 
@@ -148,4 +149,34 @@ public class UserSession implements Writable {
         return Joiner.on(",").join(list);
     }
 
+    public String toTop20MarkString() {
+        // output 
+        // eruid,viewcount,uniq_viewcount,
+        // cat_0,cat_1,cat_A,cat_B,cat_C,cat_D,cat_E,cat_F,cat_G,cat_H,cat_I,cat_J,cat_K,cat_L,cat_O,cat_V,
+        // max_cat,inTop20,buy
+        //
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(eruid);
+        list.add("" + viewPidHistory.size());
+        list.add("" + new HashSet<String>(viewPidHistory).size());
+
+        int maxCatCount = 0;
+        String maxCatKey = "_";
+        for (String cate : CAT_NAMES) {
+            int count = 0;
+            if (catStat.containsKey(cate)) {
+                count = catStat.get(cate);
+            }
+
+            if (count > maxCatCount) {
+                maxCatCount = count;
+                maxCatKey = cate;
+            }
+            list.add("" + count);
+        }
+        list.add(maxCatKey);
+        list.add(TrainTop20PidsAnswer.contains(eruid) ? "1" : "0");
+        list.add(buyCount > 0 ? "1" : "0");
+        return Joiner.on(",").join(list);
+    }
 }

@@ -51,7 +51,11 @@ public class EHCFinalApp extends Configured implements Tool {
             job.setReducerClass(UserPreprocessingReducer.class);
             job.setMapperClass(UserPreprocessingMapper.class);
             job.setMapOutputValueClass(UserSession.class);
-        } else if ("product".equals(type)) {
+        } else if ("userTop20Mark".equals(type)) {
+            job.setReducerClass(UserPreprocessingExtraTop20MarkReducer.class);
+            job.setMapperClass(UserPreprocessingMapper.class);
+            job.setMapOutputValueClass(UserSession.class);
+        }else if ("product".equals(type)) {
             job.setReducerClass(ProductPreprocessingReducer.class);
             job.setMapperClass(ProductPreprocessingMapper.class);
             job.setMapOutputValueClass(ProductSession.class);
